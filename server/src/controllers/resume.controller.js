@@ -1,3 +1,5 @@
+const Resume = require("../models/resume.model")
+
 async function uploadResume(req,res) {
 
     const content = req.body.content;
@@ -7,8 +9,15 @@ async function uploadResume(req,res) {
             message:"Content is required"
         })
     }
+
+    const resume = await Resume.create({
+        content:content
+    });
+
+
     res.status(200).json({
-        message:"Resume is uploaded"
+        message:"Resume saved",
+        resume
     })
     
 }
