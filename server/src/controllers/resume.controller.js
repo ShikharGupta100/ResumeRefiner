@@ -2,8 +2,10 @@ const Resume = require("../models/resume.model");
 const analyzeResume = require("../services/ai.service");
 
 async function uploadResume(req,res) {
+    console.log("UPLOAD API HIT");
 
-    const content = req.body.content;
+    const {content} = req.body;
+    console.log("Before AI");
 
     if(!content){
         return res.status(400).json({
@@ -12,7 +14,8 @@ async function uploadResume(req,res) {
     }
 
     try{
-        const analysisResult = await analyzeResume(content);
+        const analysisResult = await analyzeResume(content);        
+        console.log(analysisResult);
 
         const resume = await Resume.create({
             content,
@@ -60,4 +63,4 @@ async function getAllResumes(req,res) {
     
 
 
-module.exports = getAllResumes,uploadResume
+module.exports = {getAllResumes,uploadResume}
