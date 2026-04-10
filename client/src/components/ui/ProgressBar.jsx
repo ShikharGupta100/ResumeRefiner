@@ -1,4 +1,3 @@
-// src/components/ui/ProgressBar.jsx
 
 export default function ProgressBar({ value, max = 100, color = "var(--primary)", height = 8 }) {
   const pct = Math.min(100, Math.round((value / max) * 100));

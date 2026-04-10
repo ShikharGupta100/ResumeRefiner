@@ -47,19 +47,31 @@ export default function ResumeHistory({ resumes, pagination, page, nextPage, pre
       })}
 
       {/* Pagination */}
-      {pagination && (
-        <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginTop:"16px" }}>
-          <Button onClick={prevPage} disabled={page === 1} variant="secondary">
-            ← Prev
-          </Button>
-          <span style={{ color:"var(--text-muted)", fontSize:"0.85rem" }}>
-            Page {pagination.page} of {pagination.totalPages}
-          </span>
-          <Button onClick={nextPage} disabled={!pagination.hasNextPage} variant="secondary">
-            Next →
-          </Button>
-        </div>
-      )}
+{pagination && (
+  <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginTop:"16px" }}>
+    <Button 
+      id="prev-btn"
+      name="prevPage"
+      onClick={prevPage} 
+      disabled={page === 1} 
+      variant="secondary"
+    >
+      ← Prev
+    </Button>
+    <span style={{ color:"var(--text-muted)", fontSize:"0.85rem" }}>
+      Page {pagination.page} of {pagination.totalPages}
+    </span>
+    <Button 
+      id="next-btn"
+      name="nextPage"
+      onClick={nextPage} 
+      disabled={!pagination.hasNextPage} 
+      variant="secondary"
+    >
+      Next →
+    </Button>
+  </div>
+)}
     </div>
   );
 }

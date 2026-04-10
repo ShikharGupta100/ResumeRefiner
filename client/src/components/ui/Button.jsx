@@ -3,6 +3,7 @@
 export default function Button({
   children, onClick, disabled = false,
   variant = "primary", fullWidth = false, type = "button",
+  id, name,  
 }) {
   const styles = {
     primary:   { background: "var(--primary)", color: "#fff", border: "none" },
@@ -12,6 +13,8 @@ export default function Button({
 
   return (
     <button
+      id={id}              
+      name={name}          
       type={type}
       onClick={onClick}
       disabled={disabled}

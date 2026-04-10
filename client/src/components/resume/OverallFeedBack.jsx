@@ -1,7 +1,7 @@
 // src/components/resume/OverallFeedback.jsx
 import Card from "../ui/Card";
 
-export default function OverallFeedback({ feedback }) {
+export default function OverallFeedBack({ feedback }) {
   if (!feedback) return null;
   return (
     <Card style={{ borderLeft: "4px solid var(--primary)" }}>

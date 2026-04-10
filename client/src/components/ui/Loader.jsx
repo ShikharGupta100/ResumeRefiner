@@ -1,4 +1,3 @@
-// src/components/ui/Loader.jsx
 
 export default function Loader({ message = "Analyzing your resume with AI..." }) {
   return (

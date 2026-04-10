@@ -6,7 +6,7 @@ export default function Footer() {
       textAlign:"center", color:"var(--text-muted)", fontSize:"0.8rem",
       marginTop:"60px",
     }}>
-      Built with Groq AI · LLaMA 3.3 70B · MongoDB
+      Built By SG
     </footer>
   );
 }

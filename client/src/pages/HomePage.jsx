@@ -39,7 +39,7 @@ export default function HomePage() {
           ⚡ AI Resume ATS Checker
         </h1>
         <p style={{ color:"var(--text-muted)", fontSize:"1rem", maxWidth:"520px", margin:"0 auto" }}>
-          Powered by LLaMA 3.3 70B · Get your ATS score, grade, and actionable feedback in seconds.
+           Get your ATS score, grade, and actionable feedback in seconds.
         </p>
       </div>
 

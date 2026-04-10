@@ -1,6 +1,6 @@
 // src/components/ui/Card.jsx
 
-export default function Card({ children, style = {} }) {
+export default function Card({ children, style = {},onClick}) {
   return (
     <div style={{
       background:   "var(--surface)",
@@ -9,7 +9,9 @@ export default function Card({ children, style = {} }) {
       padding:      "24px",
       boxShadow:    "var(--shadow)",
       ...style,
-    }}>
+    }}
+     onClick={onClick}
+    >
       {children}
     </div>
   );

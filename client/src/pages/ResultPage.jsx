@@ -54,9 +54,9 @@ export default function ResultPage() {
       {/* Score Hero */}
       <Card style={{ textAlign:"center", marginBottom:"24px" }}>
         <ScoreRing score={data.score} grade={data.grade} />
-        // This line should already be there — if not, add it:
+        {/* This line should already be there — if not, add it:*/}
 <div style={{ gridColumn:"1 / -1" }}>
-  <OverallFeedback feedback={data.overallFeedback} />
+  <OverallFeedBack feedback={data.OverallFeedback} />
 </div>
       </Card>
 

@@ -25,10 +25,13 @@ export function useResumeHistory() {
 
   useEffect(() => { load(page); }, [page, load]);
 
+  
+
   return {
     resumes, pagination, loading, error,
     nextPage: () => setPage((p) => p + 1),
     prevPage: () => setPage((p) => Math.max(1, p - 1)),
     page, reload: () => load(page),
+    
   };
 }
