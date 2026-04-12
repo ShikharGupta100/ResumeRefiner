@@ -1,23 +1,16 @@
-const nodemailer = require("nodemailer");
+const Brevo = require("@getbrevo/brevo");
 
 async function sendVerificationEmail(email, name, token) {
   const link = `${process.env.CLIENT_URL}/verify-email?token=${token}`;
 
-  const transporter = nodemailer.createTransport({
-    host: "smtp-relay.brevo.com",
-    port: 587,
-    secure: false,
-    auth: {
-      user: process.env.BREVO_USER,
-      pass: process.env.BREVO_SMTP_KEY,
-    },
-  });
+  const apiInstance = new Brevo.TransactionalEmailsApi();
+  apiInstance.authentications["api-key"].apiKey = process.env.BREVO_API_KEY;
 
-  await transporter.sendMail({
-    from: `"ATS Resume Checker" <${process.env.BREVO_USER}>`,
-    to: email,
+  await apiInstance.sendTransacEmail({
+    sender: { name: "ATS Resume Checker", email: process.env.BREVO_USER },
+    to: [{ email }],
     subject: "Verify your email — ATS Resume Checker",
-    html: `
+    htmlContent: `
       <div style="font-family:sans-serif;max-width:480px;margin:auto">
         <h2>Hi ${name} 👋</h2>
         <p>Thanks for signing up! Please verify your email.</p>
