@@ -1,17 +1,17 @@
 const nodemailer = require("nodemailer");
 
-const transporter = nodemailer.createTransport({
-  host: "smtp-relay.brevo.com",
-  port: 587,
-  secure: false,
-  auth: {
-    user: process.env.BREVO_USER,  // your brevo email
-    pass: process.env.BREVO_SMTP_KEY,  // smtp key from brevo
-  },
-});
-
 async function sendVerificationEmail(email, name, token) {
   const link = `${process.env.CLIENT_URL}/verify-email?token=${token}`;
+
+  const transporter = nodemailer.createTransport({
+    host: "smtp-relay.brevo.com",
+    port: 587,
+    secure: false,
+    auth: {
+      user: process.env.BREVO_USER,
+      pass: process.env.BREVO_SMTP_KEY,
+    },
+  });
 
   await transporter.sendMail({
     from: `"ATS Resume Checker" <${process.env.BREVO_USER}>`,
