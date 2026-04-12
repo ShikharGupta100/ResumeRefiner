@@ -1,6 +1,6 @@
 // src/constants/index.js
 
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/api";
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://resumerefiner-cesx.onrender.com/api" ;
 
 export const GRADE_META = {
   A: { color: "#22c55e", bg: "#dcfce7", label: "Excellent" },
