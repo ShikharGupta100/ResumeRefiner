@@ -32,7 +32,10 @@ async function register(req, res) {
       verificationTokenExpiry: expiry,
     });
 
-    await sendVerificationEmail(email, name, token);
+    // Send email in background — don't block registration
+    sendVerificationEmail(email, name, token).catch(err =>
+      console.error("[email failed]:", err.message)
+    );
 
     return res.status(201).json({
       success: true,
