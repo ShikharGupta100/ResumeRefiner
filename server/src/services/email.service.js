@@ -1,18 +1,37 @@
-const { Resend } = require('resend');
-const resend = new Resend(process.env.RESEND_API_KEY);
+const nodemailer = require("nodemailer");
+
+const transporter = nodemailer.createTransport({
+  host: "smtp-relay.brevo.com",
+  port: 587,
+  secure: false,
+  auth: {
+    user: process.env.BREVO_USER,  // your brevo email
+    pass: process.env.BREVO_SMTP_KEY,  // smtp key from brevo
+  },
+});
 
 async function sendVerificationEmail(email, name, token) {
   const link = `${process.env.CLIENT_URL}/verify-email?token=${token}`;
-  
-  await resend.emails.send({
-    from: 'onboarding@resend.dev',
+
+  await transporter.sendMail({
+    from: `"ATS Resume Checker" <${process.env.BREVO_USER}>`,
     to: email,
-    subject: 'Verify your email — ATS Resume Checker',
-    html: `<h2>Hi ${name} 👋</h2>
-           <p>Click below to verify your email:</p>
-           <a href="${link}">Verify Email</a>`
+    subject: "Verify your email — ATS Resume Checker",
+    html: `
+      <div style="font-family:sans-serif;max-width:480px;margin:auto">
+        <h2>Hi ${name} 👋</h2>
+        <p>Thanks for signing up! Please verify your email.</p>
+        <a href="${link}" style="
+          display:inline-block;padding:12px 24px;
+          background:#6366f1;color:#fff;border-radius:8px;
+          text-decoration:none;font-weight:600;margin:16px 0
+        ">Verify Email</a>
+        <p style="color:#888;font-size:0.85rem">
+          Link expires in 24 hours.
+        </p>
+      </div>
+    `,
   });
 }
 
 module.exports = { sendVerificationEmail };
-
