@@ -1,67 +1,3 @@
-// const Resume = require("../models/resume.model");
-// const analyzeResume = require("../services/ai.service");
-
-// async function uploadResume(req,res) {
-//     console.log("UPLOAD API HIT");
-
-//     const {content} = req.body;
-//     console.log("Before AI");
-
-//     if(!content){
-//         return res.status(400).json({
-//             message:"Content is required"
-//         })
-//     }
-
-//     try{
-//         const analysisResult = await analyzeResume(content);        
-//         console.log(analysisResult);
-
-//         const resume = await Resume.create({
-//             content,
-//             score:analysisResult.score,
-//             strengths:analysisResult.strengths,
-//             weaknesses:analysisResult.weaknesses,
-//             suggestions:analysisResult.suggestions
-//         });
-
-//         res.status(200).json({
-//             message:"Resume analyzed and saved successfully",
-//             resume,
-//         })
-
-
-
-//     }
-//     catch(error){
-//         res.status(500).json({
-//             message:"Something went wrong",
-//             error:error.message
-//         })
-//     }
-    
-// }
-
-// async function getAllResumes(req,res) {
-//     try{
-//         const resumes = await Resume.find()
-    
-//             res.status(200).json({
-//                 message:"ResumeList found",
-//                 resumes
-//             })    
-
-//     }catch(error){
-//         res.status(500).json({
-//             message:error.message
-//         })
-//     }
-// }
-
-
- 
-    
-
 
 // module.exports = {getAllResumes,uploadResume}
 // server/src/controllers/resume.controller.js
@@ -285,4 +221,45 @@ async function getResumeById(req, res) {
   }
 }
 
-module.exports = { uploadResume, getAllResumes, getResumeById };
+/**
+ * DELETE /api/resumes/:id
+ * Deletes a single resume by ID.
+ */
+async function deleteResume(req,res) {
+  try{
+    const resume = await Resume.findByIdAndDelete(req.params.id);
+
+    if(!resume){
+      return res.status(404).json({
+        success : false,
+        code : "NOT_FOUND",
+        message: "Resume not found.",
+      });
+    }
+
+    return res.status(200).json({
+      success:true,
+      message:"Resume deleted successfully",
+    });
+
+  }catch(error){
+    if(error.name == "CastError"){
+      return res.status(400).json({
+        success:false,
+        code:"INVALID_ID",
+        message:"Invalid resume ID format.",
+      });
+    }
+
+    
+    console.error("[deleteResume]",error.message);
+    return res.status(500).json({
+      success:false,
+      code:"INTERNAL_ERROR",
+      message:"Failed to delete resume",
+    });
+  }
+  
+}
+
+module.exports = { uploadResume, getAllResumes, getResumeById, deleteResume};

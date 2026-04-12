@@ -1,24 +1,12 @@
-// const express = require("express");
-// const cors = require("cors");
-// const resumeRoutes = require("./routes/resume.routes");
 
-// const app = express();
-// app.use(express.json());
-// app.use(cors());
-
-// app.use("/resume",resumeRoutes)
-
-// app.get("/test",(req,res)=>{
-//     res.send("Server Working");
-// })
-
-// module.exports = app
-// server/src/app.js
 
 const express  = require("express");
 const cors     = require("cors");
 const helmet   = require("helmet");
 const morgan   = require("morgan");
+const passport = require("./config/passport")
+const authRoutes = require("./routes/auth.routes")
+
 
 const resumeRoutes = require("./routes/resume.routes");
 
@@ -89,6 +77,7 @@ app.get("/health", (req, res) => {
 
 // ─── API Routes ───────────────────────────────────────────────────────────────
 app.use("/api/resumes", resumeRoutes);
+app.use("/api/auth",authRoutes);
 
 // ─── 404 Handler ──────────────────────────────────────────────────────────────
 /**

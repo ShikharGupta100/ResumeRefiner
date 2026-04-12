@@ -1,70 +1,4 @@
-// const express = require("express");
-// const router = express.Router();
-// const multer = require("multer");
-// const pdfParse = require("pdf-parse");
-// const analyzeResume = require("../services/ai.service");
 
-// // ── Multer config: PDF only, max 5MB ──────────────────────────────────────────
-// const upload = multer({
-//   storage: multer.memoryStorage(),
-//   limits: { fileSize: 5 * 1024 * 1024 },
-//   fileFilter: (req, file, cb) => {
-//     if (file.mimetype === "application/pdf") {
-//       cb(null, true);
-//     } else {
-//       cb(new Error("Only PDF files are allowed"), false);
-//     }
-//   },
-// });
-
-// // ── POST /upload-file ─────────────────────────────────────────────────────────
-// router.post("/upload-file", upload.single("resume"), async (req, res) => {
-//   try {
-//     // 1. File check
-//     if (!req.file) {
-//       return res.status(400).json({ success: false, error: "No file uploaded" });
-//     }
-
-//     console.log(`[UPLOAD] File received: ${req.file.originalname} (${(req.file.size / 1024).toFixed(1)} KB)`);
-
-//     // 2. Parse PDF
-//     const pdfData = await pdfParse(req.file.buffer);
-//     const text = pdfData.text?.trim();
-
-//     if (!text) {
-//       return res.status(422).json({ success: false, error: "Could not extract text from PDF" });
-//     }
-
-//     console.log("[PDF] Parsed successfully");
-
-//     // 3. Analyze with AI
-//     const result = await analyzeResume(text);
-//     console.log("[AI] Analysis complete");
-
-//     return res.status(200).json({
-//       success: true,
-//       message: "Resume analyzed successfully",
-//       resume: result,
-//     });
-
-//   } catch (err) {
-//     console.error("[ERROR]", err.message);
-
-//     // Multer-specific errors
-//     if (err.message === "Only PDF files are allowed") {
-//       return res.status(415).json({ success: false, error: err.message });
-//     }
-
-//     if (err.code === "LIMIT_FILE_SIZE") {
-//       return res.status(413).json({ success: false, error: "File too large. Max size is 5MB" });
-//     }
-
-//     return res.status(500).json({ success: false, error: "Something went wrong. Please try again." });
-//   }
-// });
-
-// module.exports = router;
-// server/src/routes/resume.routes.js
 
 const express = require("express");
 const router  = express.Router();
@@ -76,6 +10,7 @@ const {
   uploadResume,
   getAllResumes,
   getResumeById,
+  deleteResume,
 } = require("../controllers/resume.controller");
 
 // ─── Rate Limiters ────────────────────────────────────────────────────────────
@@ -202,6 +137,17 @@ router.get(
   readLimiter,
   getResumeById
 );
+
+
+/**
+ * DELETE /api/resumes/:id
+ * Delete a single resume by ID.
+ */
+router.delete("/:id",
+  readLimiter,
+  deleteResume
+);
+
 
 // ─── Multer Error Handler ─────────────────────────────────────────────────────
 // Must be defined AFTER routes, takes 4 args so Express treats it as error middleware

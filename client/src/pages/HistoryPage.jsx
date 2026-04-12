@@ -4,7 +4,7 @@ import ResumeHistory from "../components/resume/ResumeHistory";
 import Loader        from "../components/ui/Loader";
 
 export default function HistoryPage() {
-  const { resumes, pagination, loading, error, page, nextPage, prevPage } = useResumeHistory();
+  const { resumes, pagination, loading, error, page, nextPage, prevPage ,handleDelete} = useResumeHistory();
 
   return (
     <div className="container" style={{ paddingTop:"40px", paddingBottom:"60px" }}>
@@ -20,6 +20,7 @@ export default function HistoryPage() {
         <ResumeHistory
           resumes={resumes} pagination={pagination}
           page={page} nextPage={nextPage} prevPage={prevPage}
+          onDelete={handleDelete}
         />
       )}
     </div>

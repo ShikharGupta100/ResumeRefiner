@@ -1,6 +1,6 @@
 // src/hooks/useResumeHistory.js
 import { useState, useEffect, useCallback } from "react";
-import { fetchResumes } from "../api/resumeApi";
+import { fetchResumes , deleteResume} from "../api/resumeApi";
 
 export function useResumeHistory() {
   const [resumes,    setResumes]    = useState([]);
@@ -25,6 +25,15 @@ export function useResumeHistory() {
 
   useEffect(() => { load(page); }, [page, load]);
 
+  const handleDelete = useCallback(async (id)=>{
+    try{
+      await deleteResume(id);
+      setResumes((prev) => prev.filter((r) => r._id !== id));
+    }catch(error){
+      setError(error.message);
+    }
+  },[]);
+
   
 
   return {
@@ -32,6 +41,7 @@ export function useResumeHistory() {
     nextPage: () => setPage((p) => p + 1),
     prevPage: () => setPage((p) => Math.max(1, p - 1)),
     page, reload: () => load(page),
+    handleDelete,
     
   };
 }
