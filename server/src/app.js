@@ -59,6 +59,7 @@ app.use(express.urlencoded({ extended: true, limit: "50kb" }));
  */
 const LOG_FORMAT = process.env.NODE_ENV === "production" ? "combined" : "dev";
 app.use(morgan(LOG_FORMAT));
+app.use(passport.initialize());
 
 // ─── Health Check ─────────────────────────────────────────────────────────────
 /**
