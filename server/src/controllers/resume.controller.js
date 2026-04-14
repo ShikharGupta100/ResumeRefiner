@@ -66,6 +66,18 @@ function sanitizeContent(content) {
     .trim();
 }
 
+function clampBreakdown(breakdown) {
+  if (!breakdown) return breakdown;
+  return {
+    keywordDensity:         Math.min(breakdown.keywordDensity         ?? 0, 25),
+    workExperience:         Math.min(breakdown.workExperience         ?? 0, 20),
+    quantifiedAchievements: Math.min(breakdown.quantifiedAchievements ?? 0, 20),
+    formatting:             Math.min(breakdown.formatting             ?? 0, 15),
+    skillsSection:          Math.min(breakdown.skillsSection          ?? 0, 10),
+    education:              Math.min(breakdown.education              ?? 0, 10),
+  };
+}
+
 // ─── Controllers ──────────────────────────────────────────────────────────────
 
 /**
@@ -96,7 +108,7 @@ async function uploadResume(req, res) {
       content,
       score:          analysis.score,
       grade:          analysis.grade,
-      scoreBreakdown: analysis.scoreBreakdown,
+      scoreBreakdown: clampBreakdown(analysis.scoreBreakdown),
       strengths:      analysis.strengths,
       weaknesses:     analysis.weaknesses,
       suggestions:    analysis.suggestions,
@@ -188,7 +200,8 @@ async function getAllResumes(req, res) {
  */
 async function getResumeById(req, res) {
   try {
-    const resume = await Resume.findById({_id:req.params.id,
+    const resume = await Resume.findOne({
+      _id:req.params.id,
       userId : req.user._id,
   }).lean();
 
@@ -230,7 +243,7 @@ async function getResumeById(req, res) {
  */
 async function deleteResume(req,res) {
   try{
-    const resume = await Resume.findByIdAndDelete({_id:req.params.id,
+    const resume = await Resume.findOneAndDelete({_id:req.params.id,
       userId: req.user._id 
     });
 
