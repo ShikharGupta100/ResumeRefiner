@@ -25,7 +25,22 @@ export async function loginUser({ email, password }) {
   return handleResponse(res);
 }
 
-export async function verifyEmail(token) {
-  const res = await fetch(`${API_BASE_URL}/auth/verify-email?token=${token}`);
+// ✅ FIXED: sends email + otp in body (not token in query string)
+export async function verifyEmail(email, otp) {
+  const res = await fetch(`${API_BASE_URL}/auth/verify-email`, {
+    method:  "POST",
+    headers: { "Content-Type": "application/json" },
+    body:    JSON.stringify({ email, otp }),
+  });
+  return handleResponse(res);
+}
+
+// ✅ ADDED: was missing, called by SignupPage
+export async function resendOtp(email) {
+  const res = await fetch(`${API_BASE_URL}/auth/resend-otp`, {
+    method:  "POST",
+    headers: { "Content-Type": "application/json" },
+    body:    JSON.stringify({ email }),
+  });
   return handleResponse(res);
 }

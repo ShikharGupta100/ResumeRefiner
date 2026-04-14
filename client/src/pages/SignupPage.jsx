@@ -1,21 +1,34 @@
-// src/pages/SignupPage.jsx
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import { registerUser } from "../api/authApi";
+import { Link, useNavigate } from "react-router-dom";
+import { registerUser, verifyEmail, resendOtp } from "../api/authApi";
+import { useAuth } from "../context/AuthContext";
+
+const inputStyle = {
+  width: "100%", padding: "10px 14px",
+  borderRadius: "8px", border: "1px solid var(--border)",
+  background: "var(--surface)", color: "var(--text)",
+  fontSize: "0.95rem", outline: "none", boxSizing: "border-box",
+};
 
 export default function SignupPage() {
-  const [form, setForm]       = useState({ name: "", email: "", password: "" });
-  const [error, setError]     = useState("");
-  const [success, setSuccess] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const { login }   = useAuth();
+  const navigate    = useNavigate();
 
-  async function handleSubmit(e) {
+  const [form, setForm]       = useState({ name: "", email: "", password: "" });
+  const [otp, setOtp]         = useState("");
+  const [step, setStep]       = useState("register"); // "register" | "otp"
+  const [error, setError]     = useState("");
+  const [loading, setLoading] = useState(false);
+  const [resent, setResent]   = useState(false);
+
+  // ── Step 1 — Register ──────────────────────────────────────────────────────
+  async function handleRegister(e) {
     e.preventDefault();
     setError("");
     setLoading(true);
     try {
       await registerUser(form);
-      setSuccess(true);
+      setStep("otp"); // ✅ move to OTP screen
     } catch (err) {
       setError(err.message);
     } finally {
@@ -23,30 +36,104 @@ export default function SignupPage() {
     }
   }
 
-  const inputStyle = {
-    width: "100%", padding: "10px 14px",
-    borderRadius: "8px", border: "1px solid var(--border)",
-    background: "var(--surface)", color: "var(--text)",
-    fontSize: "0.95rem", outline: "none",
-    boxSizing: "border-box",
-  };
+  // ── Step 2 — Verify OTP ────────────────────────────────────────────────────
+  async function handleVerify(e) {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    try {
+      const data = await verifyEmail(form.email, otp);
+      login(data.token, data.user); // ✅ auto-login
+      navigate("/");
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
 
-  if (success) return (
+  // ── Resend OTP ─────────────────────────────────────────────────────────────
+  async function handleResend() {
+    setError("");
+    setResent(false);
+    try {
+      await resendOtp(form.email);
+      setResent(true);
+    } catch (err) {
+      setError(err.message);
+    }
+  }
+
+  // ── OTP Screen ─────────────────────────────────────────────────────────────
+  if (step === "otp") return (
     <div style={{ minHeight: "80vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
-      <div style={{ textAlign: "center", maxWidth: "400px", padding: "36px" }}>
+      <div style={{
+        width: "100%", maxWidth: "400px", padding: "36px",
+        background: "var(--surface)", borderRadius: "16px",
+        border: "1px solid var(--border)", textAlign: "center",
+      }}>
         <div style={{ fontSize: "3rem", marginBottom: "16px" }}>📬</div>
         <h2 style={{ fontWeight: 700, marginBottom: "8px" }}>Check your inbox</h2>
-        <p style={{ color: "var(--text-muted)", fontSize: "0.9rem" }}>
-          We sent a verification link to <strong>{form.email}</strong>.
-          Click it to activate your account.
+        <p style={{ color: "var(--text-muted)", fontSize: "0.875rem", marginBottom: "24px" }}>
+          We sent a 6-digit code to <strong>{form.email}</strong>.
+          It expires in <strong>10 minutes</strong>.
         </p>
-        <Link to="/login" style={{ color: "var(--primary)", fontWeight: 600, display: "block", marginTop: "20px" }}>
-          Back to Login
-        </Link>
+
+        {error && (
+          <p style={{ color: "var(--danger)", fontSize: "0.875rem", marginBottom: "16px" }}>❌ {error}</p>
+        )}
+        {resent && (
+          <p style={{ color: "green", fontSize: "0.875rem", marginBottom: "16px" }}>✅ New code sent!</p>
+        )}
+
+        <form onSubmit={handleVerify} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+          <input
+            style={{ ...inputStyle, fontSize: "1.8rem", textAlign: "center", letterSpacing: "12px", fontWeight: 700 }}
+            type="text"
+            placeholder="000000"
+            maxLength={6}
+            value={otp}
+            required
+            onChange={e => setOtp(e.target.value.replace(/\D/g, ""))} // numbers only
+          />
+          <button
+            type="submit" disabled={loading || otp.length !== 6}
+            style={{
+              padding: "11px", borderRadius: "8px", border: "none",
+              background: "var(--primary)", color: "#fff",
+              fontWeight: 600, fontSize: "0.95rem", cursor: "pointer",
+              opacity: (loading || otp.length !== 6) ? 0.7 : 1,
+            }}
+          >
+            {loading ? "Verifying..." : "Verify Email"}
+          </button>
+        </form>
+
+        <button
+          onClick={handleResend}
+          style={{
+            marginTop: "16px", background: "none", border: "none",
+            color: "var(--primary)", fontWeight: 600,
+            fontSize: "0.875rem", cursor: "pointer",
+          }}
+        >
+          Didn't get the code? Resend
+        </button>
+
+        <p style={{ marginTop: "12px", fontSize: "0.875rem", color: "var(--text-muted)" }}>
+          Wrong email?{" "}
+          <button
+            onClick={() => { setStep("register"); setOtp(""); setError(""); }}
+            style={{ background: "none", border: "none", color: "var(--primary)", fontWeight: 600, cursor: "pointer" }}
+          >
+            Go back
+          </button>
+        </p>
       </div>
     </div>
   );
 
+  // ── Register Screen ────────────────────────────────────────────────────────
   return (
     <div style={{ minHeight: "80vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
       <div style={{
@@ -63,7 +150,7 @@ export default function SignupPage() {
           <p style={{ color: "var(--danger)", fontSize: "0.875rem", marginBottom: "16px" }}>❌ {error}</p>
         )}
 
-        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+        <form onSubmit={handleRegister} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
           <input
             style={inputStyle} type="text" placeholder="Full name"
             value={form.name} required
@@ -92,8 +179,9 @@ export default function SignupPage() {
           </button>
         </form>
 
-        <a
-          href="http://localhost:3000/api/auth/google"
+        
+          <a
+          href={`${import.meta.env.VITE_API_URL}/api/auth/google`}
           style={{
             display: "flex", alignItems: "center", justifyContent: "center",
             gap: "10px", marginTop: "12px", padding: "11px",
