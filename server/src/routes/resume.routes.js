@@ -104,6 +104,7 @@ async function parsePdf(req, res, next) {
 router.post(
   "/",
   analyzeLimiter,
+  protect,
   uploadResume         // controller handles validation + AI + DB save
 );
 
@@ -127,6 +128,7 @@ router.post(
 router.get(
   "/",
   readLimiter,
+  protect,
   getAllResumes
 );
 
@@ -137,6 +139,7 @@ router.get(
 router.get(
   "/:id",
   readLimiter,
+  protect,
   getResumeById
 );
 
@@ -147,6 +150,7 @@ router.get(
  */
 router.delete("/:id",
   readLimiter,
+  protect,
   deleteResume
 );
 
