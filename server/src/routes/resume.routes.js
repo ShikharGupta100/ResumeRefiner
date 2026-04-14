@@ -5,6 +5,7 @@ const router  = express.Router();
 const multer  = require("multer");
 const pdfParse = require("pdf-parse");
 const rateLimit = require("express-rate-limit");
+const { protect } = require("../middleware/auth.middleware");
 
 const {
   uploadResume,

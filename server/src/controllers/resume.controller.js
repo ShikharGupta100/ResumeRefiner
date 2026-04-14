@@ -92,6 +92,7 @@ async function uploadResume(req, res) {
 
     // ── 3. Persist full result to DB ──
     const resume = await Resume.create({
+      userId: req.user._id,
       content,
       score:          analysis.score,
       grade:          analysis.grade,
@@ -148,13 +149,13 @@ async function getAllResumes(req, res) {
     const skip  = (page - 1) * limit;
 
     const [resumes, total] = await Promise.all([
-      Resume.find()
+      Resume.find({ userId: req.user._id })
         .select("-content")          // never send full resume text in list
         .sort({ createdAt: -1 })     // newest first
         .skip(skip)
         .limit(limit)
         .lean(),                     // plain JS object, faster than Mongoose doc
-      Resume.countDocuments(),
+      Resume.countDocuments({ userId: req.user._id }),
     ]);
 
     return res.status(200).json({
@@ -187,7 +188,9 @@ async function getAllResumes(req, res) {
  */
 async function getResumeById(req, res) {
   try {
-    const resume = await Resume.findById(req.params.id).lean();
+    const resume = await Resume.findById({_id:req.params.id,
+      userId : req.user._id,
+  }).lean();
 
     if (!resume) {
       return res.status(404).json({
@@ -227,7 +230,9 @@ async function getResumeById(req, res) {
  */
 async function deleteResume(req,res) {
   try{
-    const resume = await Resume.findByIdAndDelete(req.params.id);
+    const resume = await Resume.findByIdAndDelete({_id:req.params.id,
+      userId: req.user._id 
+    });
 
     if(!resume){
       return res.status(404).json({
