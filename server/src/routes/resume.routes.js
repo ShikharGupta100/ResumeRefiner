@@ -114,6 +114,7 @@ router.post(
 router.post(
   "/upload-pdf",
   analyzeLimiter,
+  protect,
   upload.single("resume"),  // multer runs first
   parsePdf,                 // extract text from buffer
   uploadResume              // same controller — no duplication
