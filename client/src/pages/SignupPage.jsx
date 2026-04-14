@@ -181,7 +181,7 @@ export default function SignupPage() {
 
         
           <a
-          href={`${import.meta.env.VITE_API_URL}/api/auth/google`}
+          href={`${import.meta.env.VITE_API_BASE_URL}/auth/google`}
           style={{
             display: "flex", alignItems: "center", justifyContent: "center",
             gap: "10px", marginTop: "12px", padding: "11px",

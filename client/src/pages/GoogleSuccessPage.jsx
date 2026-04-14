@@ -2,6 +2,7 @@
 import { useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { API_BASE_URL } from "../constants";
 
 export default function GoogleSuccessPage() {
   const [searchParams] = useSearchParams();
@@ -12,14 +13,20 @@ export default function GoogleSuccessPage() {
     const token = searchParams.get("token");
     if (!token) { navigate("/login"); return; }
 
-    // Decode user info from JWT payload (public data only)
-    try {
-      const payload = JSON.parse(atob(token.split(".")[1]));
-      login(token, { id: payload.id });
-      navigate("/");
-    } catch {
-      navigate("/login?error=google_failed");
-    }
+     // Fetch full user info instead of decoding JWT (JWT only has id)
+    fetch(`${API_BASE_URL}/auth/me`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          login(token, data.user); // ✅ has id, name, email
+          navigate("/");
+        } else {
+          navigate("/login?error=google_failed");
+        }
+      })
+      .catch(() => navigate("/login?error=google_failed"));
   }, []);
 
   return (
