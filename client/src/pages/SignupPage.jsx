@@ -3,358 +3,23 @@ import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { registerUser, verifyEmail, resendOtp } from "../api/authApi";
 import { useAuth } from "../context/AuthContext";
-
-const css = `
-  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Syne:wght@500;700;800&display=swap');
-
-  .sp-wrap {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    min-height: 100vh;
-    font-family: 'Syne', sans-serif;
-  }
-
-  /* Left panel */
-  .sp-left {
-    background: #6366f1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 48px;
-    position: relative;
-    overflow: hidden;
-  }
-  .sp-left::before {
-    content: '';
-    position: absolute;
-    width: 400px; height: 400px;
-    background: rgba(255,255,255,0.06);
-    border-radius: 50%;
-    top: -100px; left: -100px;
-  }
-  .sp-left::after {
-    content: '';
-    position: absolute;
-    width: 300px; height: 300px;
-    background: rgba(255,255,255,0.04);
-    border-radius: 50%;
-    bottom: -80px; right: -80px;
-  }
-  .sp-feature-card {
-    background: #0f0f1a;
-    border: 1px solid #1e1e2e;
-    border-radius: 20px;
-    padding: 28px;
-    width: 280px;
-    position: relative;
-    z-index: 1;
-    box-shadow: 0 0 60px rgba(0,0,0,0.4);
-  }
-  .sp-feature-title {
-    color: #94a3b8;
-    font-size: 13px;
-    font-family: 'JetBrains Mono', monospace;
-    margin-bottom: 20px;
-  }
-  .sp-feature-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 0;
-    border-bottom: 1px solid #1e1e2e;
-  }
-  .sp-feature-item:last-child { border-bottom: none; }
-  .sp-feature-icon {
-    width: 36px; height: 36px;
-    border-radius: 10px;
-    background: rgba(99,102,241,0.15);
-    border: 1px solid rgba(99,102,241,0.2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #818cf8;
-    flex-shrink: 0;
-  }
-  .sp-feature-label {
-    font-size: 13px;
-    font-weight: 600;
-    color: #e2e8f0;
-  }
-  .sp-feature-sub {
-    font-size: 11px;
-    color: #475569;
-    font-family: 'JetBrains Mono', monospace;
-    margin-top: 2px;
-  }
-  .sp-left-caption {
-    color: rgba(255,255,255,0.5);
-    font-size: 12px;
-    font-family: 'JetBrains Mono', monospace;
-    margin-top: 20px;
-    position: relative;
-    z-index: 1;
-    text-align: center;
-  }
-
-  /* Right panel */
-  .sp-right {
-    background: #111118;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 48px;
-  }
-  .sp-form-wrap {
-    width: 100%;
-    max-width: 380px;
-  }
-  .sp-heading {
-    font-size: 36px;
-    font-weight: 800;
-    color: #e2e8f0;
-    margin-bottom: 6px;
-    line-height: 1.1;
-  }
-  .sp-subheading {
-    color: #475569;
-    font-size: 13px;
-    font-family: 'JetBrains Mono', monospace;
-    margin-bottom: 32px;
-  }
-  .sp-label {
-    display: block;
-    font-size: 13px;
-    font-weight: 600;
-    color: #94a3b8;
-    margin-bottom: 8px;
-  }
-  .sp-input-wrap {
-    position: relative;
-    margin-bottom: 16px;
-  }
-  .sp-input-icon {
-    position: absolute;
-    left: 14px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #6366f1;
-    pointer-events: none;
-    display: flex;
-  }
-  .sp-input {
-    width: 100%;
-    background: #0a0a12;
-    border: 1px solid #1e1e2e;
-    border-radius: 12px;
-    color: #e2e8f0;
-    font-size: 14px;
-    font-family: 'Syne', sans-serif;
-    padding: 12px 16px 12px 42px;
-    outline: none;
-    box-sizing: border-box;
-    transition: border-color 0.2s, box-shadow 0.2s;
-  }
-  .sp-input:focus {
-    border-color: #6366f1;
-    box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
-  }
-  .sp-input::placeholder { color: #334155; }
-  .sp-input.error {
-    border-color: #ef4444;
-    animation: sp-shake 0.4s ease;
-  }
-  @keyframes sp-shake {
-    0%,100% { transform: translateX(0); }
-    20% { transform: translateX(-6px); }
-    40% { transform: translateX(6px); }
-    60% { transform: translateX(-4px); }
-    80% { transform: translateX(4px); }
-  }
-  .sp-eye {
-    position: absolute;
-    right: 14px;
-    top: 50%;
-    transform: translateY(-50%);
-    cursor: pointer;
-    color: #475569;
-    display: flex;
-  }
-  .sp-strength {
-    height: 4px;
-    border-radius: 99px;
-    background: #1e1e2e;
-    margin-top: 8px;
-    overflow: hidden;
-    margin-bottom: 16px;
-  }
-  .sp-strength-fill {
-    height: 100%;
-    border-radius: 99px;
-    transition: width 0.3s, background 0.3s;
-  }
-  .sp-btn-primary {
-    width: 100%;
-    background: #6366f1;
-    border: none;
-    color: #fff;
-    font-family: 'Syne', sans-serif;
-    font-size: 15px;
-    font-weight: 700;
-    padding: 13px;
-    border-radius: 12px;
-    cursor: pointer;
-    box-shadow: 0 0 28px rgba(99,102,241,0.35);
-    transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
-    margin-bottom: 20px;
-  }
-  .sp-btn-primary:hover:not(:disabled) { background: #4f46e5; box-shadow: 0 0 36px rgba(99,102,241,0.5); }
-  .sp-btn-primary:active:not(:disabled) { transform: scale(0.98); }
-  .sp-btn-primary:disabled { opacity: 0.45; cursor: not-allowed; box-shadow: none; }
-  .sp-divider {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 20px;
-  }
-  .sp-divider-line { flex: 1; height: 1px; background: #1e1e2e; }
-  .sp-divider-text {
-    font-size: 12px;
-    color: #334155;
-    font-family: 'JetBrains Mono', monospace;
-    white-space: nowrap;
-  }
-  .sp-btn-google {
-    width: 100%;
-    background: #0a0a12;
-    border: 1px solid #1e1e2e;
-    border-radius: 12px;
-    color: #94a3b8;
-    font-family: 'Syne', sans-serif;
-    font-size: 14px;
-    font-weight: 600;
-    padding: 12px 16px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    text-decoration: none;
-    transition: border-color 0.2s, background 0.2s;
-    margin-bottom: 24px;
-  }
-  .sp-btn-google:hover { border-color: #334155; background: #111118; }
-  .sp-error {
-    background: rgba(239,68,68,0.08);
-    border: 1px solid rgba(239,68,68,0.2);
-    border-radius: 10px;
-    color: #f87171;
-    font-size: 13px;
-    font-family: 'JetBrains Mono', monospace;
-    padding: 10px 14px;
-    margin-bottom: 16px;
-  }
-  .sp-success {
-    background: rgba(34,197,94,0.08);
-    border: 1px solid rgba(34,197,94,0.2);
-    border-radius: 10px;
-    color: #4ade80;
-    font-size: 13px;
-    font-family: 'JetBrains Mono', monospace;
-    padding: 10px 14px;
-    margin-bottom: 16px;
-  }
-  .sp-footer-text {
-    text-align: center;
-    font-size: 13px;
-    color: #475569;
-  }
-  .sp-footer-text a {
-    color: #6366f1;
-    font-weight: 600;
-    text-decoration: none;
-  }
-
-  /* OTP screen */
-  .sp-otp-wrap {
-    width: 100%;
-    max-width: 380px;
-  }
-  .sp-otp-icon {
-    width: 56px; height: 56px;
-    border-radius: 16px;
-    background: rgba(99,102,241,0.15);
-    border: 1px solid rgba(99,102,241,0.2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 24px;
-    color: #818cf8;
-  }
-  .sp-otp-input {
-    width: 100%;
-    background: #0a0a12;
-    border: 1px solid #1e1e2e;
-    border-radius: 14px;
-    color: #e2e8f0;
-    font-size: 2rem;
-    font-family: 'JetBrains Mono', monospace;
-    font-weight: 700;
-    padding: 16px;
-    text-align: center;
-    letter-spacing: 16px;
-    outline: none;
-    box-sizing: border-box;
-    transition: border-color 0.2s, box-shadow 0.2s;
-    margin-bottom: 16px;
-  }
-  .sp-otp-input:focus {
-    border-color: #6366f1;
-    box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
-  }
-  .sp-otp-input.error {
-    border-color: #ef4444;
-    animation: sp-shake 0.4s ease;
-  }
-  .sp-timer {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 5px 14px;
-    border-radius: 99px;
-    font-size: 12px;
-    font-weight: 600;
-    font-family: 'JetBrains Mono', monospace;
-    margin-bottom: 24px;
-  }
-  .sp-timer-dot {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: currentColor;
-    animation: sp-blink 1s step-start infinite;
-  }
-  @keyframes sp-blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
-  .sp-nudge {
-    background: rgba(99,102,241,0.06);
-    border: 1px solid rgba(99,102,241,0.15);
-    border-radius: 14px;
-    padding: 16px;
-    margin-top: 20px;
-  }
-  .sp-nudge p {
-    font-size: 12px;
-    color: #64748b;
-    font-family: 'JetBrains Mono', monospace;
-    text-align: center;
-    margin: 0 0 12px;
-  }
-  .sp-nudge strong { color: #818cf8; }
-
-  @media (max-width: 768px) {
-    .sp-wrap { grid-template-columns: 1fr; }
-    .sp-left { display: none; }
-  }
-`;
+import {
+  Check,
+  Clock,
+  FileText,
+  Gauge,
+  History,
+  Home,
+  Lock,
+  Mail,
+  ShieldCheck,
+  Sparkles,
+  User,
+  UserPlus,
+  Zap,
+  Eye,
+  EyeOff,
+} from "lucide-react";
 
 const GOOGLE_SVG = (
   <svg width="18" height="18" viewBox="0 0 48 48">
@@ -366,12 +31,14 @@ const GOOGLE_SVG = (
 );
 
 function getStrength(pwd) {
-  if (!pwd) return { width: "0%", color: "#1e1e2e" };
-  if (pwd.length < 4) return { width: "25%", color: "#ef4444" };
-  if (pwd.length < 6) return { width: "50%", color: "#f59e0b" };
-  if (pwd.length < 8) return { width: "75%", color: "#6366f1" };
-  return { width: "100%", color: "#22c55e" };
+  if (!pwd) return { width: "0%", label: "", segments: [false, false, false, false] };
+  if (pwd.length < 4) return { width: "25%", label: "Weak", color: "#ef4444", segments: [true, false, false, false] };
+  if (pwd.length < 6) return { width: "50%", label: "Fair", color: "#f59e0b", segments: [true, true, false, false] };
+  if (pwd.length < 8) return { width: "75%", label: "Good", color: "#6366f1", segments: [true, true, true, false] };
+  return { width: "100%", label: "Strong", color: "#22c55e", segments: [true, true, true, true] };
 }
+
+const segmentColors = ["#ef4444", "#f59e0b", "#6366f1", "#22c55e"];
 
 const OTP_NUDGE_AFTER = 90;
 
@@ -398,11 +65,11 @@ export default function SignupPage() {
     return () => clearInterval(timerRef.current);
   }, [step]);
 
-  const remaining  = Math.max(0, 600 - elapsed);
-  const mins       = String(Math.floor(remaining / 60)).padStart(2, "0");
-  const secs       = String(remaining % 60).padStart(2, "0");
-  const showNudge  = elapsed >= OTP_NUDGE_AFTER;
-  const strength   = getStrength(form.password);
+  const remaining = Math.max(0, 600 - elapsed);
+  const mins      = String(Math.floor(remaining / 60)).padStart(2, "0");
+  const secs      = String(remaining % 60).padStart(2, "0");
+  const showNudge = elapsed >= OTP_NUDGE_AFTER;
+  const strength  = getStrength(form.password);
 
   async function handleRegister(e) {
     e.preventDefault();
@@ -440,266 +107,398 @@ export default function SignupPage() {
 
   // ── OTP Screen ──────────────────────────────────────────────────────────────
   if (step === "otp") return (
-    <>
-      <style>{css}</style>
-      <div className="sp-wrap">
-        {/* Left panel */}
-        <div className="sp-left">
-          <div className="sp-feature-card">
-            <div className="sp-feature-title">// almost_there</div>
-            <div className="sp-feature-item">
-              <div className="sp-feature-icon">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
-                </svg>
-              </div>
-              <div>
-                <div className="sp-feature-label">Check your inbox</div>
-                <div className="sp-feature-sub">{form.email}</div>
-              </div>
-            </div>
-            <div className="sp-feature-item">
-              <div className="sp-feature-icon">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                  <rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>
-                </svg>
-              </div>
-              <div>
-                <div className="sp-feature-label">6-digit code</div>
-                <div className="sp-feature-sub">expires in {mins}:{secs}</div>
-              </div>
-            </div>
-            <div className="sp-feature-item">
-              <div className="sp-feature-icon">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                  <polyline points="20 6 9 17 4 12"/>
-                </svg>
-              </div>
-              <div>
-                <div className="sp-feature-label">One step away</div>
-                <div className="sp-feature-sub">from your account</div>
-              </div>
-            </div>
+    <div className="bg-neutral-950 text-neutral-50 min-h-screen w-screen overflow-x-hidden">
+      {/* Navbar */}
+      <nav className="sticky z-50 top-0 w-full backdrop-blur-md bg-[#0a0a0f]/90 border-b border-white/10">
+        <div className="flex px-8 justify-between items-center h-16">
+          <div className="font-bold text-indigo-500 text-lg flex items-center gap-2">
+            <Zap className="size-5 fill-[#6366f1]" />
+            <span>ATS Resume Checker</span>
           </div>
-          <p className="sp-left-caption">// check spam if you don't see it</p>
+          <div className="flex items-center gap-8">
+            <a className="text-slate-200 text-sm flex items-center gap-2 border-b-2 border-indigo-500 pb-1">
+              <Home className="size-4" /> Home
+            </a>
+            <a className="text-slate-200/70 text-sm flex items-center gap-2 hover:text-slate-200 transition-colors cursor-pointer">
+              <FileText className="size-4" /> Analyze
+            </a>
+            <a className="text-slate-200/70 text-sm flex items-center gap-2 hover:text-slate-200 transition-colors cursor-pointer">
+              <History className="size-4" /> History
+            </a>
+            <a className="text-slate-200/70 text-sm flex items-center gap-2 hover:text-slate-200 transition-colors cursor-pointer">
+              <Zap className="size-4" /> Pricing
+            </a>
+          </div>
+          <div className="flex items-center gap-2">
+            <Link to="/login" className="text-slate-200 px-4 py-2 rounded-lg hover:bg-white/5 transition-colors text-sm font-medium">Login</Link>
+            <Link to="/signup" className="bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-[0_0_20px_rgba(99,102,241,0.4)] hover:bg-indigo-600 transition-colors">Sign Up</Link>
+          </div>
+        </div>
+      </nav>
+
+      <div className="grid grid-cols-2 min-h-[calc(100vh-64px)]">
+        {/* Left */}
+        <div className="relative bg-[#111118] flex flex-col items-center justify-center p-12 overflow-hidden">
+          <div className="absolute top-1/3 left-1/2 -translate-x-1/2 size-[420px] blur-2xl rounded-full bg-indigo-500/35" />
+          <div className="relative z-10 flex flex-col items-center">
+            {/* Resume mockup card */}
+            <div className="relative">
+              <div className="shadow-[0_20px_60px_rgba(0,0,0,0.5)] rounded-2xl bg-[#1a1a24] border border-[#2a2a3a] flex p-6 flex-col gap-3 w-56 h-72">
+                <div className="rounded-full bg-indigo-500/60 w-24 h-3" />
+                <div className="rounded-full bg-[#2a2a3a] w-full h-2" />
+                <div className="w-5/6 rounded-full bg-[#2a2a3a] h-2" />
+                <div className="rounded-full bg-[#2a2a3a] w-full h-2" />
+                <div className="w-2/3 rounded-full bg-[#2a2a3a] h-2" />
+                <div className="rounded-full bg-indigo-500/40 mt-2 w-20 h-2" />
+                <div className="rounded-full bg-[#2a2a3a] w-full h-2" />
+                <div className="w-4/5 rounded-full bg-[#2a2a3a] h-2" />
+              </div>
+              <div className="backdrop-blur-md shadow-lg font-semibold rounded-full bg-white/5 text-slate-200 text-xs border border-white/10 flex absolute -right-10 -top-5 px-3 py-1.5 items-center gap-2">
+                <Gauge className="size-3.5 text-indigo-500" /> ATS Score: 91
+              </div>
+              <div className="top-1/2 backdrop-blur-md shadow-lg font-semibold rounded-full bg-white/5 text-slate-200 text-xs border border-white/10 flex absolute -left-14 px-3 py-1.5 items-center gap-2">
+                <Check className="size-3.5 text-emerald-400" /> Keywords Matched
+              </div>
+              <div className="backdrop-blur-md shadow-lg font-semibold rounded-full bg-white/5 text-slate-200 text-xs border border-white/10 flex absolute -right-8 -bottom-5 px-3 py-1.5 items-center gap-2">
+                <Sparkles className="size-3.5 text-amber-400" /> Formatting: Excellent
+              </div>
+            </div>
+            <p className="font-bold text-center text-slate-200 text-2xl mt-16">
+              Almost there!
+            </p>
+            <p className="max-w-sm text-center text-slate-500 text-sm mt-3">
+              Check your inbox at <span className="text-indigo-400 font-medium">{form.email}</span> for your 6-digit verification code.
+            </p>
+            <p className="text-slate-600 text-xs mt-3">// check spam if you don't see it</p>
+          </div>
         </div>
 
         {/* Right: OTP form */}
-        <div className="sp-right">
-          <div className="sp-otp-wrap">
-            <div className="sp-otp-icon">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
-              </svg>
+        <div className="animate-in fade-in duration-700 bg-[#0a0a0f] flex px-12 py-8 flex-col justify-center">
+          <div className="max-w-md mx-auto w-full">
+            {/* Stepper */}
+            <div className="flex mb-8 justify-between items-center">
+              <div className="flex flex-col items-center gap-2">
+                <div className="size-9 rounded-full bg-[#1e1e2e] text-slate-500 flex justify-center items-center">
+                  <Check className="size-4" />
+                </div>
+                <span className="font-medium text-slate-500 text-xs">Register</span>
+              </div>
+              <div className="bg-indigo-500/40 mx-2 flex-1 h-px" />
+              <div className="flex flex-col items-center gap-2">
+                <div className="size-9 shadow-[0_0_16px_rgba(99,102,241,0.5)] rounded-full bg-indigo-500 text-white flex justify-center items-center">
+                  <ShieldCheck className="size-4" />
+                </div>
+                <span className="font-medium text-indigo-500 text-xs">Verify</span>
+              </div>
+              <div className="bg-[#1e1e2e] mx-2 flex-1 h-px" />
+              <div className="flex flex-col items-center gap-2">
+                <div className="size-9 rounded-full bg-[#1e1e2e] text-slate-500 flex justify-center items-center">
+                  <Check className="size-4" />
+                </div>
+                <span className="font-medium text-slate-500 text-xs">Done</span>
+              </div>
             </div>
 
-            <h1 className="sp-heading">Check inbox</h1>
-            <p className="sp-subheading">// 6-digit code sent to {form.email}</p>
+            <h1 className="leading-tight font-bold text-slate-200 text-[32px]">Check your inbox</h1>
+            <p className="text-slate-500 text-sm mt-1 mb-6">
+              6-digit code sent to <span className="text-slate-300">{form.email}</span>
+            </p>
 
-            <span className="sp-timer" style={{ background: remaining < 60 ? "rgba(239,68,68,0.1)" : "rgba(34,197,94,0.1)", color: remaining < 60 ? "#f87171" : "#4ade80" }}>
-              <span className="sp-timer-dot" />
+            {error  && <div className="bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm px-4 py-3 mb-4">⚠ {error}</div>}
+            {resent && <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-emerald-400 text-sm px-4 py-3 mb-4">✓ New code sent!</div>}
+
+            {/* Timer badge */}
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-6 text-xs font-semibold"
+              style={{ background: remaining < 60 ? "rgba(239,68,68,0.1)" : "rgba(99,102,241,0.1)", color: remaining < 60 ? "#f87171" : "#818cf8" }}>
+              <Clock className="size-3.5" />
               {mins}:{secs}
-            </span>
+            </div>
 
-            {error  && <div className="sp-error">⚠ {error}</div>}
-            {resent && <div className="sp-success">✓ New code sent!</div>}
-
+            {/* OTP boxes */}
             <form onSubmit={handleVerify}>
-              <input
-                className={`sp-otp-input${otpError ? " error" : ""}`}
-                type="text" placeholder="——————"
-                maxLength={6} value={otp} required
-                onChange={e => setOtp(e.target.value.replace(/\D/g, ""))}
-              />
-              <button type="submit" disabled={loading || otp.length !== 6} className="sp-btn-primary">
+              <div className="rounded-2xl bg-[#111118]/60 border border-[#1e1e2e] p-5 mb-5">
+                <div className="flex mb-4 justify-between items-center">
+                  <p className="font-medium text-slate-200 text-sm">Verify your email</p>
+                  <div className="font-semibold rounded-full bg-indigo-500/15 text-indigo-500 text-xs flex px-3 py-1 items-center gap-1.5">
+                    <Clock className="size-3.5" />{mins}:{secs}
+                  </div>
+                </div>
+                <div className="flex justify-between items-center gap-2">
+                  {Array.from({ length: 6 }).map((_, i) => (
+                    <div
+                      key={i}
+                      className={`font-bold rounded-xl text-slate-200 text-lg border flex justify-center items-center w-12 h-14 transition-all ${
+                        i < otp.length
+                          ? "bg-[#111118] border-indigo-500 shadow-[0_0_16px_rgba(99,102,241,0.4)]"
+                          : "bg-[#111118] border-[#1e1e2e] text-slate-500"
+                      } ${otpError ? "border-red-500" : ""}`}
+                    >
+                      {otp[i] ?? ""}
+                    </div>
+                  ))}
+                </div>
+                {/* Hidden real input */}
+                <input
+                  type="text"
+                  maxLength={6}
+                  value={otp}
+                  onChange={e => setOtp(e.target.value.replace(/\D/g, ""))}
+                  className="sr-only"
+                  autoFocus
+                />
+                <p className="text-center text-slate-500 text-xs mt-4">
+                  Didn't receive a code?{" "}
+                  <button type="button" onClick={handleResend} className="text-slate-400 underline cursor-pointer bg-transparent border-none hover:text-indigo-400 transition-colors">
+                    Resend Code
+                  </button>
+                </p>
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading || otp.length !== 6}
+                className="w-full bg-indigo-500 text-white font-bold py-3 rounded-xl text-sm shadow-[0_0_24px_rgba(99,102,241,0.5)] hover:bg-indigo-600 transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none mb-4"
+              >
                 {loading ? "Verifying…" : "Verify Email →"}
               </button>
             </form>
 
-            <div style={{ textAlign: "center", marginBottom: 16 }}>
-              <button onClick={handleResend} style={{ background: "none", border: "none", color: "#6366f1", fontWeight: 600, fontSize: "13px", cursor: "pointer", fontFamily: "'JetBrains Mono', monospace" }}>
-                Didn't get it? Resend code
-              </button>
-            </div>
-
             {showNudge && (
-              <div className="sp-nudge">
-                <p><strong>Still waiting?</strong> Skip OTP and sign in with Google instead.</p>
-                <a href={`${import.meta.env.VITE_API_BASE_URL}/auth/google`} className="sp-btn-google" style={{ marginBottom: 0 }}>
+              <div className="rounded-2xl bg-indigo-500/5 border border-indigo-500/15 p-4 mb-4">
+                <p className="text-center text-slate-500 text-xs mb-3">
+                  <span className="text-indigo-400 font-semibold">Still waiting?</span> Skip OTP and sign in with Google instead.
+                </p>
+                <a
+                  href={`${import.meta.env.VITE_API_BASE_URL}/auth/google`}
+                  className="w-full bg-[#111118] border border-[#1e1e2e] rounded-xl text-slate-200 text-sm font-semibold py-3 flex items-center justify-center gap-2.5 hover:border-[#334155] hover:bg-[#111118] transition-colors"
+                >
                   {GOOGLE_SVG} Continue with Google
                 </a>
               </div>
             )}
 
-            <p className="sp-footer-text" style={{ marginTop: 20 }}>
+            <p className="text-center text-slate-500 text-sm">
               Wrong email?{" "}
-              <button onClick={() => { setStep("register"); setOtp(""); setError(""); }} style={{ background: "none", border: "none", color: "#6366f1", fontWeight: 600, cursor: "pointer", fontSize: "13px", fontFamily: "'Syne', sans-serif" }}>
+              <button
+                onClick={() => { setStep("register"); setOtp(""); setError(""); }}
+                className="text-indigo-500 font-semibold bg-transparent border-none cursor-pointer hover:text-indigo-400 transition-colors"
+              >
                 Go back
               </button>
             </p>
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 
   // ── Register Screen ──────────────────────────────────────────────────────────
   return (
-    <>
-      <style>{css}</style>
-      <div className="sp-wrap">
-
-        {/* Left panel */}
-        <div className="sp-left">
-          <div className="sp-feature-card">
-            <div className="sp-feature-title">// what_you_get</div>
-            <div className="sp-feature-item">
-              <div className="sp-feature-icon">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                  <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-                </svg>
-              </div>
-              <div>
-                <div className="sp-feature-label">Keyword Analysis</div>
-                <div className="sp-feature-sub">match job description</div>
-              </div>
-            </div>
-            <div className="sp-feature-item">
-              <div className="sp-feature-icon">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                  <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
-                </svg>
-              </div>
-              <div>
-                <div className="sp-feature-label">ATS Score</div>
-                <div className="sp-feature-sub">instant compatibility</div>
-              </div>
-            </div>
-            <div className="sp-feature-item">
-              <div className="sp-feature-icon">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
-                </svg>
-              </div>
-              <div>
-                <div className="sp-feature-label">AI Suggestions</div>
-                <div className="sp-feature-sub">tailored improvements</div>
-              </div>
-            </div>
-            <div className="sp-feature-item">
-              <div className="sp-feature-icon">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                  <rect x="14" y="2" width="4" height="20"/><rect x="6" y="12" width="4" height="10"/><rect x="2" y="17" width="4" height="5"/>
-                </svg>
-              </div>
-              <div>
-                <div className="sp-feature-label">Score Breakdown</div>
-                <div className="sp-feature-sub">detailed analytics</div>
-              </div>
-            </div>
+    <div className="bg-neutral-950 text-neutral-50 min-h-screen w-screen overflow-x-hidden">
+      {/* Navbar */}
+      <nav className="sticky z-50 top-0 w-full backdrop-blur-md bg-[#0a0a0f]/90 border-b border-white/10">
+        <div className="flex px-8 justify-between items-center h-16">
+          <div className="font-bold text-indigo-500 text-lg flex items-center gap-2">
+            <Zap className="size-5 fill-[#6366f1]" />
+            <span>ATS Resume Checker</span>
           </div>
-          <p className="sp-left-caption">// free forever · no credit card needed</p>
+          <div className="flex items-center gap-8">
+            <a className="text-slate-200 text-sm flex items-center gap-2 border-b-2 border-indigo-500 pb-1">
+              <Home className="size-4" /> Home
+            </a>
+            <a className="text-slate-200/70 text-sm flex items-center gap-2 hover:text-slate-200 transition-colors cursor-pointer">
+              <FileText className="size-4" /> Analyze
+            </a>
+            <a className="text-slate-200/70 text-sm flex items-center gap-2 hover:text-slate-200 transition-colors cursor-pointer">
+              <History className="size-4" /> History
+            </a>
+            <a className="text-slate-200/70 text-sm flex items-center gap-2 hover:text-slate-200 transition-colors cursor-pointer">
+              <Zap className="size-4" /> Pricing
+            </a>
+          </div>
+          <div className="flex items-center gap-2">
+            <Link to="/login" className="text-slate-200 px-4 py-2 rounded-lg hover:bg-white/5 transition-colors text-sm font-medium">Login</Link>
+            <Link to="/signup" className="bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-[0_0_20px_rgba(99,102,241,0.4)] hover:bg-indigo-600 transition-colors">Sign Up</Link>
+          </div>
+        </div>
+      </nav>
+
+      <div className="grid grid-cols-2 min-h-[calc(100vh-64px)]">
+        {/* Left panel */}
+        <div className="relative bg-[#111118] flex flex-col p-12 justify-center items-center overflow-hidden">
+          <div className="absolute top-1/3 left-1/2 -translate-x-1/2 size-[420px] blur-2xl rounded-full bg-indigo-500/35" />
+          <div className="relative z-10 flex flex-col items-center">
+            {/* Resume mockup */}
+            <div className="relative">
+              <div className="shadow-[0_20px_60px_rgba(0,0,0,0.5)] rounded-2xl bg-[#1a1a24] border border-[#2a2a3a] flex p-6 flex-col gap-3 w-56 h-72">
+                <div className="rounded-full bg-indigo-500/60 w-24 h-3" />
+                <div className="rounded-full bg-[#2a2a3a] w-full h-2" />
+                <div className="w-5/6 rounded-full bg-[#2a2a3a] h-2" />
+                <div className="rounded-full bg-[#2a2a3a] w-full h-2" />
+                <div className="w-2/3 rounded-full bg-[#2a2a3a] h-2" />
+                <div className="rounded-full bg-indigo-500/40 mt-2 w-20 h-2" />
+                <div className="rounded-full bg-[#2a2a3a] w-full h-2" />
+                <div className="w-4/5 rounded-full bg-[#2a2a3a] h-2" />
+              </div>
+              <div className="backdrop-blur-md shadow-lg font-semibold rounded-full bg-white/5 text-slate-200 text-xs border border-white/10 flex absolute -right-10 -top-5 px-3 py-1.5 items-center gap-2">
+                <Gauge className="size-3.5 text-indigo-500" /> ATS Score: 91
+              </div>
+              <div className="top-1/2 backdrop-blur-md shadow-lg font-semibold rounded-full bg-white/5 text-slate-200 text-xs border border-white/10 flex absolute -left-14 px-3 py-1.5 items-center gap-2">
+                <Check className="size-3.5 text-emerald-400" /> Keywords Matched
+              </div>
+              <div className="backdrop-blur-md shadow-lg font-semibold rounded-full bg-white/5 text-slate-200 text-xs border border-white/10 flex absolute -right-8 -bottom-5 px-3 py-1.5 items-center gap-2">
+                <Sparkles className="size-3.5 text-amber-400" /> Formatting: Excellent
+              </div>
+            </div>
+            <p className="font-bold text-center text-slate-200 text-2xl leading-8 mt-16">
+              Start for free. No credit card required.
+            </p>
+            <p className="max-w-sm text-center text-slate-500 text-sm mt-3">
+              Join thousands of job seekers optimizing their resumes to beat applicant tracking systems and land more interviews.
+            </p>
+          </div>
         </div>
 
         {/* Right: Register form */}
-        <div className="sp-right">
-          <div className="sp-form-wrap">
-            <h1 className="sp-heading">Create Account</h1>
-            <p className="sp-subheading">// start analyzing your resume for free</p>
+        <div className="animate-in fade-in duration-700 bg-[#0a0a0f] flex px-12 py-8 flex-col justify-center">
+          <div className="max-w-md mx-auto w-full">
+            {/* Stepper */}
+            <div className="flex mb-8 justify-between items-center">
+              <div className="flex flex-col items-center gap-2">
+                <div className="size-9 shadow-[0_0_16px_rgba(99,102,241,0.5)] rounded-full bg-indigo-500 text-white flex justify-center items-center">
+                  <UserPlus className="size-4" />
+                </div>
+                <span className="font-medium text-indigo-500 text-xs">Register</span>
+              </div>
+              <div className="bg-[#1e1e2e] mx-2 flex-1 h-px" />
+              <div className="flex flex-col items-center gap-2">
+                <div className="size-9 rounded-full bg-[#1e1e2e] text-slate-500 flex justify-center items-center">
+                  <ShieldCheck className="size-4" />
+                </div>
+                <span className="font-medium text-slate-500 text-xs">Verify</span>
+              </div>
+              <div className="bg-[#1e1e2e] mx-2 flex-1 h-px" />
+              <div className="flex flex-col items-center gap-2">
+                <div className="size-9 rounded-full bg-[#1e1e2e] text-slate-500 flex justify-center items-center">
+                  <Check className="size-4" />
+                </div>
+                <span className="font-medium text-slate-500 text-xs">Done</span>
+              </div>
+            </div>
 
-            {error && <div className="sp-error">⚠ {error}</div>}
+            <h1 className="leading-tight font-bold text-slate-200 text-[32px]">Create your account</h1>
+            <p className="text-slate-500 text-sm mt-1 mb-6">Enter your details to get started in seconds.</p>
+
+            {error && <div className="bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm px-4 py-3 mb-4">⚠ {error}</div>}
 
             <form onSubmit={handleRegister}>
-              {/* Name */}
-              <label className="sp-label">Full Name</label>
-              <div className="sp-input-wrap">
-                <span className="sp-input-icon">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                    <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
-                  </svg>
-                </span>
-                <input
-                  className="sp-input"
-                  type="text" placeholder="John Doe"
-                  value={form.name} required
-                  onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
-                />
+              <div className="flex flex-col gap-4">
+                {/* Full Name */}
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-slate-200 text-sm">Full Name</label>
+                  <div className="relative">
+                    <User className="absolute top-1/2 -translate-y-1/2 left-3 size-4 text-slate-500 pointer-events-none" />
+                    <input
+                      type="text"
+                      placeholder="Jane Doe"
+                      value={form.name}
+                      required
+                      onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+                      className="w-full bg-[#111118] text-slate-200 border border-[#1e1e2e] rounded-xl pl-9 pr-4 py-3 text-sm outline-none focus:border-indigo-500 focus:shadow-[0_0_0_3px_rgba(99,102,241,0.12)] transition-all placeholder:text-slate-600"
+                    />
+                  </div>
+                </div>
+
+                {/* Email */}
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-slate-200 text-sm">Email</label>
+                  <div className="relative">
+                    <Mail className="absolute top-1/2 -translate-y-1/2 left-3 size-4 text-slate-500 pointer-events-none" />
+                    <input
+                      type="email"
+                      placeholder="jane@example.com"
+                      value={form.email}
+                      required
+                      onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
+                      className="w-full bg-[#111118] text-slate-200 border border-[#1e1e2e] rounded-xl pl-9 pr-4 py-3 text-sm outline-none focus:border-indigo-500 focus:shadow-[0_0_0_3px_rgba(99,102,241,0.12)] transition-all placeholder:text-slate-600"
+                    />
+                  </div>
+                </div>
+
+                {/* Password */}
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-slate-200 text-sm">Password</label>
+                  <div className="relative">
+                    <Lock className="absolute top-1/2 -translate-y-1/2 left-3 size-4 text-slate-500 pointer-events-none" />
+                    <input
+                      type={showPass ? "text" : "password"}
+                      placeholder="••••••••"
+                      value={form.password}
+                      required
+                      minLength={6}
+                      onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
+                      className="w-full bg-[#111118] text-slate-200 border border-[#1e1e2e] rounded-xl pl-9 pr-10 py-3 text-sm outline-none focus:border-indigo-500 focus:shadow-[0_0_0_3px_rgba(99,102,241,0.12)] transition-all placeholder:text-slate-600"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPass(s => !s)}
+                      className="absolute top-1/2 -translate-y-1/2 right-3 text-slate-500 hover:text-slate-300 transition-colors"
+                    >
+                      {showPass ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                    </button>
+                  </div>
+                  {/* Strength bars */}
+                  <div className="flex mt-1 items-center gap-2">
+                    <div className="flex flex-1 gap-1.5">
+                      {strength.segments.map((active, i) => (
+                        <div
+                          key={i}
+                          className="rounded-full flex-1 h-1 transition-all duration-300"
+                          style={{ background: active ? segmentColors[i] : "#1e1e2e" }}
+                        />
+                      ))}
+                    </div>
+                    {strength.label && (
+                      <span className="font-medium text-xs" style={{ color: strength.color }}>
+                        {strength.label}
+                      </span>
+                    )}
+                  </div>
+                </div>
               </div>
 
-              {/* Email */}
-              <label className="sp-label">Email</label>
-              <div className="sp-input-wrap">
-                <span className="sp-input-icon">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                    <rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 7 10-7"/>
-                  </svg>
-                </span>
-                <input
-                  className="sp-input"
-                  type="email" placeholder="you@example.com"
-                  value={form.email} required
-                  onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
-                />
-              </div>
-
-              {/* Password */}
-              <label className="sp-label">Password</label>
-              <div className="sp-input-wrap" style={{ marginBottom: 8 }}>
-                <span className="sp-input-icon">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                    <rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>
-                  </svg>
-                </span>
-                <input
-                  className="sp-input"
-                  type={showPass ? "text" : "password"}
-                  placeholder="min 6 characters"
-                  value={form.password} required minLength={6}
-                  onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
-                  style={{ paddingRight: "42px" }}
-                />
-                <span className="sp-eye" onClick={() => setShowPass(s => !s)}>
-                  {showPass ? (
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
-                    </svg>
-                  ) : (
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
-                      <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
-                      <line x1="1" y1="1" x2="23" y2="23"/>
-                    </svg>
-                  )}
-                </span>
-              </div>
-              {/* Password strength bar */}
-              <div className="sp-strength">
-                <div className="sp-strength-fill" style={{ width: strength.width, background: strength.color }} />
-              </div>
-
-              <button type="submit" disabled={loading} className="sp-btn-primary">
-                {loading ? "Creating account…" : "Sign Up →"}
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-indigo-500 text-white font-bold py-3 rounded-xl text-sm shadow-[0_0_24px_rgba(99,102,241,0.5)] hover:bg-indigo-600 transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none mt-5"
+              >
+                {loading ? "Creating account…" : "Create Account"}
               </button>
             </form>
 
-            <div className="sp-divider">
-              <div className="sp-divider-line" />
-              <span className="sp-divider-text">or continue with</span>
-              <div className="sp-divider-line" />
+            <div className="flex my-4 items-center gap-3">
+              <div className="bg-[#1e1e2e] flex-1 h-px" />
+              <span className="text-slate-500 text-xs">or</span>
+              <div className="bg-[#1e1e2e] flex-1 h-px" />
             </div>
 
-            <a href={`${import.meta.env.VITE_API_BASE_URL}/auth/google`} className="sp-btn-google">
-              {GOOGLE_SVG}
-              Continue with Google
+            <a
+              href={`${import.meta.env.VITE_API_BASE_URL}/auth/google`}
+              className="w-full bg-[#111118] border border-[#1e1e2e] rounded-xl text-slate-200 text-sm font-semibold py-3 flex items-center justify-center gap-2.5 hover:border-[#334155] hover:bg-[#0f0f18] transition-colors mb-6"
+            >
+              {GOOGLE_SVG} Sign up with Google
             </a>
 
-            <p className="sp-footer-text">
+            <p className="text-center text-slate-500 text-sm">
               Already have an account?{" "}
-              <Link to="/login">Log in</Link>
+              <Link to="/login" className="text-indigo-500 font-semibold hover:text-indigo-400 transition-colors">
+                Log in
+              </Link>
             </p>
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }
