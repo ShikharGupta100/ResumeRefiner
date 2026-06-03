@@ -47,13 +47,13 @@ export default function ResultPage() {
   return (
     <div className="bg-[#0a0a0f] text-neutral-50 min-h-screen w-full">
 
-      {/* ── Slim Navbar — no login/signup/pricing ── */}
+      {/* ── Slim Navbar ── */}
       <nav className="sticky z-50 top-0 w-full backdrop-blur-md bg-[#0a0a0f]/90 border-b border-white/10">
         <div className="flex px-4 sm:px-6 lg:px-8 justify-between items-center h-14">
           <Link to="/" className="font-bold text-indigo-500 text-base flex items-center gap-2 shrink-0">
             <Zap className="size-4 fill-[#6366f1]" />
             <span className="hidden sm:inline">ATS Resume Checker</span>
-            <span className="sm:hidden">ATS Checker</span>
+            <span className="sm:hidden">ATS</span>
           </Link>
           <div className="flex items-center gap-4 sm:gap-6">
             <Link to="/" className="text-slate-200/70 text-sm flex items-center gap-1.5 hover:text-slate-200 transition-colors">
@@ -83,33 +83,35 @@ export default function ResultPage() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
 
         {/* Header */}
-        <div className="mb-6 sm:mb-8">
+        <div className="mb-6 sm:mb-8 text-center">
           <h1 className="font-bold text-slate-200 text-xl sm:text-2xl">Resume Analysis Results</h1>
           <p className="text-slate-500 text-sm mt-1">Detailed ATS compatibility breakdown for your resume</p>
         </div>
 
-        {/* ── Responsive grid: single col mobile, two col desktop ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6">
+        {/* ── Two column layout: left fluid, right fixed 300px ── */}
+        <div className="flex flex-col lg:flex-row gap-6 items-start">
 
-          {/* ── LEFT column ── */}
-          <div className="flex flex-col gap-6 min-w-0">
+          {/* ── LEFT: main content, natural flow ── */}
+          <div className="flex flex-col gap-6 w-full lg:flex-1 min-w-0">
 
-            {/* Score + Overall Feedback */}
+            {/* Score + AI Summary row */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-              {/* ATS Score card */}
-              <div className="rounded-2xl bg-[#111118] border border-[#1e1e2e] p-5 sm:p-6 shadow-[0_0_40px_-10px_rgba(99,102,241,0.35)] flex flex-col items-center gap-4">
-                <div className="w-full flex justify-between items-start">
+              {/* ATS Score */}
+              <div className="rounded-2xl bg-[#111118] border border-[#1e1e2e] p-5 sm:p-6 shadow-[0_0_40px_-10px_rgba(99,102,241,0.35)] flex flex-col gap-4">
+                <div className="flex justify-between items-start">
                   <div>
                     <h2 className="text-slate-200 font-semibold text-base">ATS Score</h2>
                     <p className="text-slate-500 text-xs mt-0.5">Overall compatibility</p>
                   </div>
                   {data.grade && <GradeBadge grade={data.grade} />}
                 </div>
-                <ScoreRing score={data.score} grade={data.grade} />
+                <div className="flex justify-center">
+                  <ScoreRing score={data.score} grade={data.grade} />
+                </div>
               </div>
 
-              {/* AI Summary card */}
+              {/* AI Summary */}
               {data.OverallFeedback && (
                 <div className="rounded-2xl bg-[#111118] border border-[#1e1e2e] border-l-[3px] border-l-indigo-500 p-5 sm:p-6 flex flex-col gap-3">
                   <h2 className="text-slate-200 font-semibold text-base flex items-center gap-2">
@@ -165,26 +167,27 @@ export default function ResultPage() {
             )}
           </div>
 
-          {/* ── RIGHT column ── */}
-          <div className="flex flex-col gap-6">
+          {/* ── RIGHT: sidebar, sticks to top while scrolling ── */}
+          <div className="w-full lg:w-[300px] shrink-0 flex flex-col gap-4 lg:sticky lg:top-20 lg:self-start">
 
             {/* Section Checklist */}
             {data.detectedSections && (
-              <div className="rounded-2xl bg-[#111118] border border-[#1e1e2e] p-5 sm:p-6">
+              <div className="rounded-2xl bg-[#111118] border border-[#1e1e2e] p-5">
                 <h2 className="text-slate-200 font-semibold text-base mb-4">Section Checklist</h2>
                 <SectionChecklist detectedSections={data.detectedSections} />
               </div>
             )}
 
-            {/* Analyze another */}
+            {/* Analyze Another — sits below checklist, never overlaps */}
             <button
               onClick={() => navigate("/")}
-              className="w-full flex items-center justify-center gap-2 bg-indigo-500 text-white font-semibold py-3 rounded-xl text-sm shadow-[0_0_24px_-4px_rgba(99,102,241,0.5)] hover:bg-indigo-600 active:scale-[0.98] transition-all"
+              className="w-full flex items-center justify-center gap-2 bg-indigo-500 text-white font-semibold py-3 rounded-xl text-sm shadow-[0_0_20px_-4px_rgba(99,102,241,0.5)] hover:bg-indigo-600 active:scale-[0.98] transition-all"
             >
               <RefreshCw className="size-4" />
               Analyze Another Resume
             </button>
           </div>
+
         </div>
       </div>
     </div>
