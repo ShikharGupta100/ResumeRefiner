@@ -1,16 +1,28 @@
-// src/components/resume/OverallFeedback.jsx
-import Card from "../ui/Card";
+// src/components/resume/MissingKeywords.jsx
+export default function MissingKeywords({ keywords }) {
+  if (!keywords?.length) return null;
 
-export default function OverallFeedBack({ feedback }) {
-  if (!feedback) return null;
+  // Split into high (red) and medium (orange) priority — first half red, rest orange
+  const mid = Math.ceil(keywords.length / 2);
+
   return (
-    <Card style={{ borderLeft: "4px solid var(--primary)" }}>
-      <h3 style={{ marginBottom: "10px", fontSize: "1rem", fontWeight: 600 }}>
-        🧠 AI Executive Summary
-      </h3>
-      <p style={{ color: "var(--text-muted)", lineHeight: 1.7, fontSize: "0.9rem" }}>
-        {feedback}
-      </p>
-    </Card>
+    <div className="flex flex-wrap gap-2">
+      {keywords.map((kw, i) => {
+        const high = i < mid;
+        return (
+          <span
+            key={i}
+            className="px-3 py-1.5 rounded-full text-xs font-medium border"
+            style={
+              high
+                ? { background: "rgba(239,68,68,0.1)", color: "#ef4444", borderColor: "rgba(239,68,68,0.3)" }
+                : { background: "rgba(249,115,22,0.1)", color: "#f97316", borderColor: "rgba(249,115,22,0.3)" }
+            }
+          >
+            {kw}
+          </span>
+        );
+      })}
+    </div>
   );
 }

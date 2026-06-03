@@ -9,16 +9,7 @@ import SectionChecklist from "../components/resume/SectionChecklist";
 import MissingKeywords  from "../components/resume/MissingKeywords";
 import OverallFeedBack  from "../components/resume/OverallFeedBack";
 import Loader           from "../components/ui/Loader";
-import {
-  Download,
-  FileText,
-  History,
-  Home,
-  RefreshCw,
-  Sparkles,
-  TriangleAlert,
-  Zap,
-} from "lucide-react";
+import { FileText, History, Home, RefreshCw, Zap } from "lucide-react";
 
 export default function ResultPage() {
   const { id }      = useParams();
@@ -44,7 +35,7 @@ export default function ResultPage() {
       <p className="text-red-400 text-sm">❌ {error}</p>
       <button
         onClick={() => navigate("/")}
-        className="bg-indigo-500 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-indigo-600 transition-colors"
+        className="bg-indigo-500 text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-indigo-600 transition-colors"
       >
         Go Home
       </button>
@@ -53,150 +44,162 @@ export default function ResultPage() {
 
   if (!data) return null;
 
-  // Derive grade badge color
-  const gradeColor = data.grade?.startsWith("A")
-    ? { bg: "bg-green-500/15", text: "text-green-400", border: "border-green-500/40" }
-    : data.grade?.startsWith("B")
-    ? { bg: "bg-amber-500/15", text: "text-amber-500", border: "border-amber-500/40" }
-    : { bg: "bg-red-500/15", text: "text-red-400", border: "border-red-500/40" };
-
   return (
-    <div className="bg-neutral-950 text-neutral-50 min-h-screen w-screen overflow-x-hidden">
+    <div className="bg-[#0a0a0f] text-neutral-50 min-h-screen w-full">
 
-      {/* ── Navbar ── */}
-      <nav className="sticky z-50 top-0 w-full backdrop-blur-md bg-neutral-900/80 border-b border-white/10">
-        <div className="flex px-8 justify-between items-center h-16">
-          <div className="flex items-center gap-2">
-            <Zap className="size-5 text-indigo-500" />
-            <span className="font-bold text-indigo-500 text-lg">ATS Resume Checker</span>
-          </div>
-          <div className="flex items-center gap-8">
-            <Link to="/" className="font-medium text-slate-200 text-sm flex items-center gap-1.5 border-b-2 border-indigo-500 pb-1">
-              <Home className="size-4" /> Home
+      {/* ── Slim Navbar — no login/signup/pricing ── */}
+      <nav className="sticky z-50 top-0 w-full backdrop-blur-md bg-[#0a0a0f]/90 border-b border-white/10">
+        <div className="flex px-4 sm:px-6 lg:px-8 justify-between items-center h-14">
+          <Link to="/" className="font-bold text-indigo-500 text-base flex items-center gap-2 shrink-0">
+            <Zap className="size-4 fill-[#6366f1]" />
+            <span className="hidden sm:inline">ATS Resume Checker</span>
+            <span className="sm:hidden">ATS Checker</span>
+          </Link>
+          <div className="flex items-center gap-4 sm:gap-6">
+            <Link to="/" className="text-slate-200/70 text-sm flex items-center gap-1.5 hover:text-slate-200 transition-colors">
+              <Home className="size-3.5" />
+              <span className="hidden sm:inline">Home</span>
             </Link>
-            <Link to="/" className="font-medium text-slate-200/70 text-sm flex items-center gap-1.5 hover:text-slate-200 transition-colors">
-              <FileText className="size-4" /> Analyze
+            <Link to="/" className="text-slate-200/70 text-sm flex items-center gap-1.5 hover:text-slate-200 transition-colors">
+              <FileText className="size-3.5" />
+              <span className="hidden sm:inline">Analyze</span>
             </Link>
-            <Link to="/history" className="font-medium text-slate-200/70 text-sm flex items-center gap-1.5 hover:text-slate-200 transition-colors">
-              <History className="size-4" /> History
+            <Link to="/history" className="text-slate-200/70 text-sm flex items-center gap-1.5 hover:text-slate-200 transition-colors">
+              <History className="size-3.5" />
+              <span className="hidden sm:inline">History</span>
             </Link>
-            <a className="font-medium text-slate-200/70 text-sm flex items-center gap-1.5 hover:text-slate-200 transition-colors cursor-pointer">
-              <Zap className="size-4" /> Pricing
-            </a>
           </div>
-          <div className="flex items-center gap-2">
-            <Link to="/login" className="text-slate-200 px-4 py-2 rounded-lg hover:bg-white/5 transition-colors text-sm font-medium">Login</Link>
-            <Link to="/signup" className="bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-[0_0_20px_rgba(99,102,241,0.4)] hover:bg-indigo-600 transition-colors">Sign Up</Link>
-          </div>
+          <button
+            onClick={() => navigate("/")}
+            className="flex items-center gap-1.5 text-slate-400 text-xs sm:text-sm border border-[#1e1e2e] px-2.5 sm:px-3 py-1.5 rounded-lg hover:border-[#334155] hover:text-slate-200 transition-all shrink-0"
+          >
+            <RefreshCw className="size-3.5" />
+            <span className="hidden sm:inline">New Analysis</span>
+          </button>
         </div>
       </nav>
 
-      {/* ── Main content ── */}
-      <div className="bg-[#0a0a0f] p-8">
-        {/* Page header */}
-        <div className="mb-6">
-          <h1 className="font-bold text-slate-200 text-2xl">Resume Analysis Results</h1>
+      {/* ── Page body ── */}
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+
+        {/* Header */}
+        <div className="mb-6 sm:mb-8">
+          <h1 className="font-bold text-slate-200 text-xl sm:text-2xl">Resume Analysis Results</h1>
           <p className="text-slate-500 text-sm mt-1">Detailed ATS compatibility breakdown for your resume</p>
         </div>
 
-        <div className="flex gap-6">
+        {/* ── Responsive grid: single col mobile, two col desktop ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6">
 
-          {/* ── Left column (65%) ── */}
-          <div className="w-[65%] flex flex-col gap-6">
+          {/* ── LEFT column ── */}
+          <div className="flex flex-col gap-6 min-w-0">
 
-            {/* ATS Score card */}
-            <div className="shadow-[0_0_40px_-10px_rgba(99,102,241,0.4)] rounded-2xl bg-[#111118] border border-[#1e1e2e] p-6 flex flex-col gap-6">
-              <div className="flex justify-between items-center">
-                <div>
-                  <h2 className="text-slate-200 text-lg font-semibold">ATS Score</h2>
-                  <p className="text-slate-500 text-sm">Overall resume compatibility</p>
+            {/* Score + Overall Feedback */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+              {/* ATS Score card */}
+              <div className="rounded-2xl bg-[#111118] border border-[#1e1e2e] p-5 sm:p-6 shadow-[0_0_40px_-10px_rgba(99,102,241,0.35)] flex flex-col items-center gap-4">
+                <div className="w-full flex justify-between items-start">
+                  <div>
+                    <h2 className="text-slate-200 font-semibold text-base">ATS Score</h2>
+                    <p className="text-slate-500 text-xs mt-0.5">Overall compatibility</p>
+                  </div>
+                  {data.grade && <GradeBadge grade={data.grade} />}
                 </div>
-                {data.grade && (
-                  <span className={`font-bold rounded-full text-sm px-3 py-1 border ${gradeColor.bg} ${gradeColor.text} ${gradeColor.border}`}>
-                    Grade {data.grade}
-                  </span>
-                )}
-              </div>
-              {/* ScoreRing component — passes score + grade as before */}
-              <div className="flex justify-center items-center">
                 <ScoreRing score={data.score} grade={data.grade} />
               </div>
+
+              {/* AI Summary card */}
+              {data.OverallFeedback && (
+                <div className="rounded-2xl bg-[#111118] border border-[#1e1e2e] border-l-[3px] border-l-indigo-500 p-5 sm:p-6 flex flex-col gap-3">
+                  <h2 className="text-slate-200 font-semibold text-base flex items-center gap-2">
+                    <span className="text-indigo-400 text-lg leading-none">✦</span> AI Summary
+                  </h2>
+                  <OverallFeedBack feedback={data.OverallFeedback} />
+                </div>
+              )}
             </div>
 
-            {/* Overall Feedback */}
-            {data.OverallFeedback && (
-              <div className="rounded-2xl bg-[#111118] border-l-4 border-l-indigo-500 border-t border-r border-b border-[#1e1e2e] p-6 flex flex-col gap-4">
-                <div className="flex items-center gap-2">
-                  <Sparkles className="size-4 text-indigo-500" />
-                  <h2 className="text-slate-200 text-lg font-semibold">AI Feedback</h2>
-                </div>
-                <OverallFeedBack feedback={data.OverallFeedback} />
+            {/* Score Breakdown */}
+            {data.scoreBreakdown && (
+              <div className="rounded-2xl bg-[#111118] border border-[#1e1e2e] p-5 sm:p-6">
+                <h2 className="text-slate-200 font-semibold text-base mb-4">Score Breakdown</h2>
+                <ScoreBreakdown breakdown={data.scoreBreakdown} />
               </div>
             )}
 
-            {/* Score Breakdown */}
-            <div className="rounded-2xl bg-[#111118] border border-[#1e1e2e] p-6 flex flex-col gap-4">
-              <h2 className="text-slate-200 text-lg font-semibold">Score Breakdown</h2>
-              <ScoreBreakdown breakdown={data.scoreBreakdown} />
-            </div>
-
             {/* Missing Keywords */}
-            <div className="rounded-2xl bg-[#111118] border border-[#1e1e2e] p-6 flex flex-col gap-4">
-              <div>
-                <h2 className="text-slate-200 text-lg font-semibold flex items-center gap-2">
-                  <TriangleAlert className="size-4 text-red-500" />
-                  Missing Keywords
-                </h2>
-                <p className="text-slate-500 text-sm mt-1">Add these to improve your match rate</p>
+            {data.missingKeywords?.length > 0 && (
+              <div className="rounded-2xl bg-[#111118] border border-[#1e1e2e] p-5 sm:p-6">
+                <div className="mb-4">
+                  <h2 className="text-slate-200 font-semibold text-base flex items-center gap-2">
+                    <span className="text-red-400">⚠</span> Missing Keywords
+                  </h2>
+                  <p className="text-slate-500 text-xs mt-1">Add these to improve your match rate</p>
+                </div>
+                <MissingKeywords keywords={data.missingKeywords} />
               </div>
-              <MissingKeywords keywords={data.missingKeywords} />
-            </div>
+            )}
 
-            {/* Strengths & Weaknesses */}
-            <div className="grid grid-cols-2 gap-6">
-              <div className="rounded-2xl bg-[#111118] border border-[#1e1e2e] p-6 flex flex-col gap-4">
-                <FeedbackSection title="Strengths" items={data.strengths} type="strengths" />
+            {/* Strengths + Weaknesses */}
+            {(data.strengths?.length > 0 || data.weaknesses?.length > 0) && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                {data.strengths?.length > 0 && (
+                  <div className="rounded-2xl bg-[#111118] border border-[#1e1e2e] p-5 sm:p-6">
+                    <FeedbackSection title="Strengths" items={data.strengths} type="strengths" />
+                  </div>
+                )}
+                {data.weaknesses?.length > 0 && (
+                  <div className="rounded-2xl bg-[#111118] border border-[#1e1e2e] p-5 sm:p-6">
+                    <FeedbackSection title="Weaknesses" items={data.weaknesses} type="weaknesses" />
+                  </div>
+                )}
               </div>
-              <div className="rounded-2xl bg-[#111118] border border-[#1e1e2e] p-6 flex flex-col gap-4">
-                <FeedbackSection title="Weaknesses" items={data.weaknesses} type="weaknesses" />
-              </div>
-            </div>
+            )}
 
             {/* Suggestions */}
-            <div className="rounded-2xl bg-[#111118] border border-[#1e1e2e] p-6 flex flex-col gap-4">
-              <FeedbackSection title="Suggestions" items={data.suggestions} type="suggestions" />
-            </div>
+            {data.suggestions?.length > 0 && (
+              <div className="rounded-2xl bg-[#111118] border border-[#1e1e2e] p-5 sm:p-6">
+                <FeedbackSection title="Suggestions" items={data.suggestions} type="suggestions" />
+              </div>
+            )}
           </div>
 
-          {/* ── Right column (35%) ── */}
-          <div className="w-[35%] flex flex-col gap-6">
+          {/* ── RIGHT column ── */}
+          <div className="flex flex-col gap-6">
 
             {/* Section Checklist */}
-            <div className="rounded-2xl bg-[#111118] border border-[#1e1e2e] p-6 flex flex-col gap-4">
-              <h2 className="text-slate-200 text-lg font-semibold">Section Checklist</h2>
-              <SectionChecklist detectedSections={data.detectedSections} />
-            </div>
+            {data.detectedSections && (
+              <div className="rounded-2xl bg-[#111118] border border-[#1e1e2e] p-5 sm:p-6">
+                <h2 className="text-slate-200 font-semibold text-base mb-4">Section Checklist</h2>
+                <SectionChecklist detectedSections={data.detectedSections} />
+              </div>
+            )}
 
-            {/* Action buttons */}
-            <div className="flex flex-col gap-3 mt-2">
-              <button
-                onClick={() => window.print()}
-                className="w-full flex items-center justify-center gap-2 bg-indigo-500 text-white font-semibold py-3 rounded-xl text-sm shadow-[0_0_24px_-4px_rgba(99,102,241,0.6)] hover:bg-indigo-600 transition-all"
-              >
-                <Download className="size-4" />
-                Download Report
-              </button>
-              <button
-                onClick={() => navigate("/")}
-                className="w-full flex items-center justify-center gap-2 bg-transparent text-slate-200 font-semibold py-3 rounded-xl text-sm border border-[#1e1e2e] hover:border-[#334155] hover:bg-[#111118] transition-all"
-              >
-                <RefreshCw className="size-4" />
-                Analyze Another Resume
-              </button>
-            </div>
+            {/* Analyze another */}
+            <button
+              onClick={() => navigate("/")}
+              className="w-full flex items-center justify-center gap-2 bg-indigo-500 text-white font-semibold py-3 rounded-xl text-sm shadow-[0_0_24px_-4px_rgba(99,102,241,0.5)] hover:bg-indigo-600 active:scale-[0.98] transition-all"
+            >
+              <RefreshCw className="size-4" />
+              Analyze Another Resume
+            </button>
           </div>
         </div>
       </div>
     </div>
+  );
+}
+
+function GradeBadge({ grade }) {
+  const g = grade?.charAt(0);
+  const cls =
+    g === "A" ? "bg-green-500/15 text-green-400 border-green-500/40"
+    : g === "B" ? "bg-amber-500/15 text-amber-500 border-amber-500/40"
+    : "bg-red-500/15 text-red-400 border-red-500/40";
+  return (
+    <span className={`font-bold rounded-full text-xs px-2.5 py-1 border ${cls} shrink-0`}>
+      Grade {grade}
+    </span>
   );
 }

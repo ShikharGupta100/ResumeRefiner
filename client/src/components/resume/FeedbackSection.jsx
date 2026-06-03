@@ -1,28 +1,28 @@
 // src/components/resume/FeedbackSection.jsx
-import Card from "../ui/Card";
-
-const ICONS = { strengths:"✅", weaknesses:"❌", suggestions:"💡" };
-const COLORS = { strengths:"#22c55e", weaknesses:"#ef4444", suggestions:"#f59e0b" };
+const ICONS  = { strengths: "✅", weaknesses: "❌", suggestions: "💡" };
+const COLORS = { strengths: "#22c55e", weaknesses: "#ef4444", suggestions: "#f59e0b" };
+const BG     = { strengths: "rgba(34,197,94,0.06)", weaknesses: "rgba(239,68,68,0.06)", suggestions: "rgba(245,158,11,0.06)" };
 
 export default function FeedbackSection({ title, items, type }) {
   if (!items?.length) return null;
+  const color = COLORS[type];
+  const bg    = BG[type];
   return (
-    <Card>
-      <h3 style={{ marginBottom:"14px", fontSize:"1rem", fontWeight:600 }}>
-        {ICONS[type]} {title}
+    <div className="flex flex-col gap-3">
+      <h3 className="text-slate-200 font-semibold text-base flex items-center gap-2">
+        <span>{ICONS[type]}</span> {title}
       </h3>
-      <ul style={{ listStyle:"none", display:"flex", flexDirection:"column", gap:"8px" }}>
+      <ul className="flex flex-col gap-2">
         {items.map((item, i) => (
-          <li key={i} style={{
-            display:"flex", gap:"10px", alignItems:"flex-start",
-            padding:"10px 12px", background:"var(--surface-2)",
-            borderRadius:"var(--radius-sm)", fontSize:"0.875rem",
-            borderLeft:`3px solid ${COLORS[type]}`,
-          }}>
-            <span>{item}</span>
+          <li
+            key={i}
+            className="flex gap-3 items-start px-3 py-2.5 rounded-xl text-sm text-slate-300 leading-relaxed"
+            style={{ background: bg, borderLeft: `3px solid ${color}` }}
+          >
+            {item}
           </li>
         ))}
       </ul>
-    </Card>
+    </div>
   );
 }

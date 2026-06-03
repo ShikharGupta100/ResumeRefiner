@@ -10,31 +10,27 @@ export default function ScoreRing({ score, grade }) {
   const offset = circ - (score / 100) * circ;
 
   return (
-    <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:"12px" }}>
-      <div style={{ position:"relative", width:"140px", height:"140px" }}>
-        <svg width="140" height="140" style={{ transform:"rotate(-90deg)" }}>
+    <div className="flex flex-col items-center gap-3 w-full">
+      <div className="relative w-[140px] h-[140px] shrink-0">
+        <svg width="140" height="140" className="-rotate-90">
           <circle cx="70" cy="70" r={radius} fill="none"
-            stroke="var(--surface-2)" strokeWidth="12" />
+            stroke="#1e1e2e" strokeWidth="12" />
           <circle cx="70" cy="70" r={radius} fill="none"
             stroke={color} strokeWidth="12"
             strokeDasharray={circ}
             strokeDashoffset={offset}
             strokeLinecap="round"
-            style={{ transition:"stroke-dashoffset 1s ease" }}
+            style={{ transition: "stroke-dashoffset 1s ease", filter: `drop-shadow(0 0 6px ${color}80)` }}
           />
         </svg>
-        <div style={{
-          position:"absolute", inset:0,
-          display:"flex", flexDirection:"column",
-          alignItems:"center", justifyContent:"center",
-        }}>
-          <span style={{ fontSize:"2rem", fontWeight:800, color }}>{score}</span>
-          <span style={{ fontSize:"0.7rem", color:"var(--text-muted)" }}>/100</span>
+        <div className="absolute inset-0 flex flex-col items-center justify-center">
+          <span className="text-[2rem] font-extrabold leading-none" style={{ color }}>{score}</span>
+          <span className="text-[0.7rem] text-slate-500 mt-0.5">/100</span>
         </div>
       </div>
-      <div style={{ display:"flex", alignItems:"center", gap:"10px" }}>
+      <div className="flex items-center gap-2.5">
         <Badge grade={grade} />
-        <span style={{ color:"var(--text-muted)", fontSize:"0.9rem" }}>{label}</span>
+        <span className="text-slate-400 text-sm">{label}</span>
       </div>
     </div>
   );

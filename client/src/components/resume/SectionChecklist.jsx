@@ -1,5 +1,5 @@
 // src/components/resume/SectionChecklist.jsx
-import Card from "../ui/Card";
+import { CircleCheck, CircleX } from "lucide-react";
 
 const LABELS = {
   hasContactInfo:    "Contact Information",
@@ -14,35 +14,35 @@ const LABELS = {
 export default function SectionChecklist({ detectedSections }) {
   if (!detectedSections) return null;
   const total   = Object.keys(LABELS).length;
-  const present = Object.values(detectedSections).filter(Boolean).length;
+  const present = Object.keys(LABELS).filter(k => detectedSections[k]).length;
 
   return (
-    <Card>
-      <div style={{ display:"flex", justifyContent:"space-between", marginBottom:"14px" }}>
-        <h3 style={{ fontSize:"1rem", fontWeight:600 }}>📋 Section Detection</h3>
-        <span style={{ color:"var(--text-muted)", fontSize:"0.85rem" }}>
-          {present}/{total} found
+    <div className="flex flex-col gap-2">
+      <div className="flex justify-between items-center mb-1">
+        <span className="text-slate-500 text-xs">{present}/{total} sections found</span>
+        <span className="text-xs font-semibold" style={{ color: present >= 5 ? "#22c55e" : present >= 3 ? "#f59e0b" : "#ef4444" }}>
+          {Math.round((present / total) * 100)}%
         </span>
       </div>
-      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"8px" }}>
-        {Object.entries(LABELS).map(([key, label]) => {
-          const found = detectedSections[key];
-          return (
-            <div key={key} style={{
-              display:"flex", alignItems:"center", gap:"8px",
-              padding:"8px 10px", borderRadius:"var(--radius-sm)",
-              background: found ? "#22c55e12" : "#ef444412",
-              border:`1px solid ${found ? "#22c55e30" : "#ef444430"}`,
-              fontSize:"0.82rem",
-            }}>
-              <span>{found ? "✅" : "❌"}</span>
-              <span style={{ color: found ? "var(--text)" : "var(--text-muted)" }}>
-                {label}
-              </span>
-            </div>
-          );
-        })}
-      </div>
-    </Card>
+      {Object.entries(LABELS).map(([key, label]) => {
+        const found = detectedSections[key];
+        return (
+          <div
+            key={key}
+            className="flex items-center gap-3 px-3 py-2 rounded-lg"
+            style={{
+              background: found ? "rgba(34,197,94,0.06)" : "rgba(239,68,68,0.04)",
+              border: `1px solid ${found ? "rgba(34,197,94,0.15)" : "rgba(239,68,68,0.12)"}`,
+            }}
+          >
+            {found
+              ? <CircleCheck className="size-4 text-green-500 shrink-0" />
+              : <CircleX className="size-4 text-red-500 shrink-0" />
+            }
+            <span className={`text-sm ${found ? "text-slate-200" : "text-slate-500"}`}>{label}</span>
+          </div>
+        );
+      })}
+    </div>
   );
 }

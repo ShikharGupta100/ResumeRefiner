@@ -1,24 +1,28 @@
 // src/components/resume/MissingKeywords.jsx
-import Card from "../ui/Card";
-
 export default function MissingKeywords({ keywords }) {
   if (!keywords?.length) return null;
+
+  // Split into high (red) and medium (orange) priority — first half red, rest orange
+  const mid = Math.ceil(keywords.length / 2);
+
   return (
-    <Card>
-      <h3 style={{ marginBottom:"14px", fontSize:"1rem", fontWeight:600 }}>
-        🔍 Missing Keywords
-      </h3>
-      <div style={{ display:"flex", flexWrap:"wrap", gap:"8px" }}>
-        {keywords.map((kw, i) => (
-          <span key={i} style={{
-            padding:"4px 12px", borderRadius:"999px", fontSize:"0.8rem",
-            background:"#ef444415", color:"#ef4444",
-            border:"1px solid #ef444430", fontWeight:500,
-          }}>
+    <div className="flex flex-wrap gap-2">
+      {keywords.map((kw, i) => {
+        const high = i < mid;
+        return (
+          <span
+            key={i}
+            className="px-3 py-1.5 rounded-full text-xs font-medium border"
+            style={
+              high
+                ? { background: "rgba(239,68,68,0.1)", color: "#ef4444", borderColor: "rgba(239,68,68,0.3)" }
+                : { background: "rgba(249,115,22,0.1)", color: "#f97316", borderColor: "rgba(249,115,22,0.3)" }
+            }
+          >
             {kw}
           </span>
-        ))}
-      </div>
-    </Card>
+        );
+      })}
+    </div>
   );
 }
