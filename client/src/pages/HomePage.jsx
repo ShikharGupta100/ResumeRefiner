@@ -8,11 +8,13 @@ import { TABS } from "../constants";
 const css = `
   @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Syne:wght@500;700;800&display=swap');
 
-  .hp-wrap {
+ .hp-wrap {
     min-height: 100vh;
     background: #09090f;
     color: #e2e8f0;
     font-family: 'Syne', sans-serif;
+    width: 100%;
+    box-sizing: border-box;
   }
   .hp-hero {
     display: flex;
