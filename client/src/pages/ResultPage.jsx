@@ -45,9 +45,9 @@ export default function ResultPage() {
   if (!data) return null;
 
   return (
-    <div className="bg-[#0a0a0f] text-neutral-50 min-h-screen w-full">
+    <div className="bg-[#0a0a0f] text-neutral-50 min-h-screen w-full overflow-x-hidden">
 
-      {/* ── Slim Navbar — no login/signup/pricing ── */}
+      {/* ── Slim Navbar ── */}
       <nav className="sticky z-50 top-0 w-full backdrop-blur-md bg-[#0a0a0f]/90 border-b border-white/10">
         <div className="flex px-4 sm:px-6 lg:px-8 justify-between items-center h-14">
           <Link to="/" className="font-bold text-indigo-500 text-base flex items-center gap-2 shrink-0">
@@ -88,11 +88,11 @@ export default function ResultPage() {
           <p className="text-slate-500 text-sm mt-1">Detailed ATS compatibility breakdown for your resume</p>
         </div>
 
-        {/* ── Responsive grid: single col mobile, two col desktop ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6">
+        {/* ── Responsive grid ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-6 items-start">
 
           {/* ── LEFT column ── */}
-          <div className="flex flex-col gap-6 min-w-0">
+          <div className="flex flex-col gap-6 min-w-0 overflow-hidden">
 
             {/* Score + Overall Feedback */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -122,7 +122,7 @@ export default function ResultPage() {
 
             {/* Score Breakdown */}
             {data.scoreBreakdown && (
-              <div className="rounded-2xl bg-[#111118] border border-[#1e1e2e] p-5 sm:p-6">
+              <div className="rounded-2xl bg-[#111118] border border-[#1e1e2e] p-5 sm:p-6 overflow-hidden">
                 <h2 className="text-slate-200 font-semibold text-base mb-4">Score Breakdown</h2>
                 <ScoreBreakdown breakdown={data.scoreBreakdown} />
               </div>
@@ -130,7 +130,7 @@ export default function ResultPage() {
 
             {/* Missing Keywords */}
             {data.missingKeywords?.length > 0 && (
-              <div className="rounded-2xl bg-[#111118] border border-[#1e1e2e] p-5 sm:p-6">
+              <div className="rounded-2xl bg-[#111118] border border-[#1e1e2e] p-5 sm:p-6 overflow-hidden">
                 <div className="mb-4">
                   <h2 className="text-slate-200 font-semibold text-base flex items-center gap-2">
                     <span className="text-red-400">⚠</span> Missing Keywords
@@ -145,12 +145,12 @@ export default function ResultPage() {
             {(data.strengths?.length > 0 || data.weaknesses?.length > 0) && (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 {data.strengths?.length > 0 && (
-                  <div className="rounded-2xl bg-[#111118] border border-[#1e1e2e] p-5 sm:p-6">
+                  <div className="rounded-2xl bg-[#111118] border border-[#1e1e2e] p-5 sm:p-6 overflow-hidden">
                     <FeedbackSection title="Strengths" items={data.strengths} type="strengths" />
                   </div>
                 )}
                 {data.weaknesses?.length > 0 && (
-                  <div className="rounded-2xl bg-[#111118] border border-[#1e1e2e] p-5 sm:p-6">
+                  <div className="rounded-2xl bg-[#111118] border border-[#1e1e2e] p-5 sm:p-6 overflow-hidden">
                     <FeedbackSection title="Weaknesses" items={data.weaknesses} type="weaknesses" />
                   </div>
                 )}
@@ -159,18 +159,18 @@ export default function ResultPage() {
 
             {/* Suggestions */}
             {data.suggestions?.length > 0 && (
-              <div className="rounded-2xl bg-[#111118] border border-[#1e1e2e] p-5 sm:p-6">
+              <div className="rounded-2xl bg-[#111118] border border-[#1e1e2e] p-5 sm:p-6 overflow-hidden">
                 <FeedbackSection title="Suggestions" items={data.suggestions} type="suggestions" />
               </div>
             )}
           </div>
 
           {/* ── RIGHT column ── */}
-          <div className="flex flex-col gap-6">
+          <div className="flex flex-col gap-6 min-w-0">
 
             {/* Section Checklist */}
             {data.detectedSections && (
-              <div className="rounded-2xl bg-[#111118] border border-[#1e1e2e] p-5 sm:p-6">
+              <div className="rounded-2xl bg-[#111118] border border-[#1e1e2e] p-5 sm:p-6 overflow-hidden">
                 <h2 className="text-slate-200 font-semibold text-base mb-4">Section Checklist</h2>
                 <SectionChecklist detectedSections={data.detectedSections} />
               </div>
